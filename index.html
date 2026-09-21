@@ -1,43 +1,9172 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard de Producción</title>
-<style>
-:root{--bg:#f5f7fb;--card:#fff;--ink:#182230;--muted:#687385;--line:#e6eaf0;--accent:#1f4f78;--accent2:#2d6f9f;--good:#237a57;--warn:#b97817;--danger:#b64747;--shadow:0 8px 28px rgba(24,34,48,.07)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}.app{display:flex;min-height:100vh}.side{width:245px;background:#172331;color:#fff;padding:22px 15px;position:sticky;top:0;height:100vh}.brand{font-weight:800;font-size:19px;padding:5px 10px 3px}.sub{font-size:12px;color:#aeb9c6;padding:0 10px 22px}.nav button{width:100%;border:0;background:transparent;color:#d9e1e8;text-align:left;padding:11px 12px;border-radius:9px;margin:2px 0;cursor:pointer;font-size:14px}.nav button:hover,.nav button.active{background:#26435d;color:#fff}.main{flex:1;padding:26px;max-width:1600px;margin:auto;width:100%}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}.title{font-size:28px;font-weight:800;margin:0 0 5px}.desc{color:var(--muted);font-size:14px}.updated{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);padding:8px 11px;border-radius:8px}.filters{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:18px}.field{display:flex;flex-direction:column;gap:5px;min-width:150px}.field label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}.field input,.field select{height:37px;border:1px solid #d9dee6;border-radius:7px;padding:0 9px;background:#fff;color:var(--ink)}.btn{height:37px;border:0;border-radius:7px;padding:0 13px;cursor:pointer;font-weight:700}.primary{background:var(--accent);color:#fff}.secondary{background:#eef2f6;color:#304154}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px;box-shadow:var(--shadow)}.kpi .l{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase}.kpi .v{font-size:28px;font-weight:800;margin-top:7px}.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-bottom:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px}.card h3{margin:0 0 14px;font-size:15px}.bars{display:flex;flex-direction:column;gap:9px;max-height:360px;overflow:auto}.barrow{display:grid;grid-template-columns:145px 1fr 70px;gap:9px;align-items:center;font-size:12px}.barlabel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#465466}.barbg{height:10px;background:#edf0f4;border-radius:10px;overflow:hidden}.barfill{height:100%;background:var(--accent2);border-radius:10px}.barval{text-align:right;font-weight:700}.trend{height:250px;display:flex;align-items:flex-end;gap:7px;border-bottom:1px solid var(--line);padding:10px 2px 0;overflow:auto}.tcol{min-width:28px;flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.tbar{width:100%;max-width:34px;background:var(--accent2);border-radius:5px 5px 0 0;min-height:2px}.tval{font-size:9px;color:var(--muted);white-space:nowrap}.tdate{font-size:9px;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);height:38px}.tablewrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:8px}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{position:sticky;top:0;background:#f4f6f9;color:#4b5868;text-align:left;padding:9px;border-bottom:1px solid var(--line);white-space:nowrap}.table td{padding:8px 9px;border-bottom:1px solid #edf0f3;white-space:nowrap}.table tr:hover td{background:#fafbfd}.empty{padding:30px;text-align:center;color:var(--muted)}.note{font-size:12px;color:var(--muted);margin-top:9px}.deptgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.dept{cursor:pointer;transition:.15s}.dept:hover{transform:translateY(-2px)}.dept .num{font-size:25px;font-weight:800;margin-top:8px}.pill{display:inline-block;font-size:10px;font-weight:800;background:#edf3f8;color:var(--accent);padding:4px 7px;border-radius:99px}.footer{margin-top:20px;font-size:11px;color:var(--muted)}@media(max-width:1000px){.side{width:190px}.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.deptgrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.app{display:block}.side{position:static;width:100%;height:auto}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.main{padding:15px}.kpis,.deptgrid{grid-template-columns:1fr}.top{display:block}.updated{display:inline-block;margin-top:10px}}
-</style></head><body><div class="app"><aside class="side"><div class="brand">JV INTERNATIONAL</div><div class="sub">Dashboard de Producción</div><div class="nav" id="nav"></div></aside><main class="main"><div id="view"></div></main></div>
-<script>
-let DATA={};let current='General';let cfg={
-'Estampado':{title:'Estampado',desc:'Producción por fecha, máquina, tipo de prenda, hit, especialidad y tiempo muerto.',metric:'Piezas trabajadas',value:'TOTAL',group:'NO. MAQUINA',groups:['NO. MAQUINA','TIPO DE PRENDA','TIPO DE HIT','ESPECIALIDAD','MOTIVO']},
-'Neck':{title:'Neck',desc:'Producción por fecha, máquina, tipo de prenda y orden de trabajo.',metric:'Total de piezas',value:'TOTAL',group:'NO. MAQUINA',groups:['NO. MAQUINA','TIPO DE PRENDA']},
-'Cuadros':{title:'Cuadros',desc:'Cantidad de cuadros por fecha, proceso, especialidad y departamento.',metric:'Total de cuadros',value:'CANT. CUADROS',group:'PROCESO',groups:['PROCESO','ESPECIALIDAD','DEPT']},
-'Empaque':{title:'Empaque',desc:'Cantidad de piezas por fecha, tipo de empaque y tipo de prenda.',metric:'Total de piezas',value:'TOTAL',group:'TIPO DE EMPAQUE',groups:['TIPO DE EMPAQUE','TIPO DE PRENDA','MOTIVO']},
-'Ejemplos':{title:'Ejemplos',desc:'Prendas trabajadas por departamento, cliente, tienda y especialidad.',metric:'Prendas',value:'PRENDAS',group:'DEPTO',groups:['DEPTO','CLIENTE','TIENDA','ESPECIALIDAD','TIPO DE HIT']},
-'Lavanderia':{title:'Lavandería',desc:'Producción por fecha, máquina, tipo de prenda, proceso, color y tiempo muerto.',metric:'Cantidad de piezas',value:'CANTIDAD DE PIEZAS',group:'NO. MAQUINA',groups:['NO. MAQUINA','TIPO DE PRENDA','TIPO DE PROCESO','COLOR','MOTIVO']}
+<!DOCTYPE html>
+<html lang="es-MX">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+
+<title>
+JV International Dashboard V2
+</title>
+
+css/dashboard.css
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            JV INTERNATIONAL
+
+        </div>
+
+        <div class="subtitle">
+
+            Dashboard V2
+
+        </div>
+
+        <nav id="nav">
+
+        </nav>
+
+    </aside>
+
+    <main>
+
+        <header class="header">
+
+            <div>
+
+                <h1 id="pageTitle">
+
+                    Dashboard
+
+                </h1>
+
+                <p id="pageDescription">
+
+                </p>
+
+            </div>
+
+            <div class="last-update">
+
+                <strong>Actualizado:</strong>
+
+                <span id="lastUpdate">
+
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <section class="filters">
+
+            <div>
+
+                <label>
+
+                    Desde
+
+                </label>
+
+                <input
+                    type="date"
+                    id="filterFrom">
+            </div>
+
+            <div>
+
+                <label>
+
+                    Hasta
+
+                </label>
+
+                <input
+                    type="date"
+                    id="filterTo">
+            </div>
+
+            <div>
+
+                <label>
+
+                    Categoría
+
+                </label>
+
+                <select
+                    id="filterDimension">
+                </select>
+
+            </div>
+
+            <div>
+
+                <label>
+
+                    Valor
+
+                </label>
+
+                <select
+                    id="filterValue">
+                </select>
+
+            </div>
+
+            <div>
+
+                <label>
+
+                    Orden
+
+                </label>
+
+                <select
+                    id="filterOrder">
+
+                    <option value="desc">
+
+                        Más reciente
+
+                    </option>
+
+                    <option value="asc">
+
+                        Más antiguo
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button id="btnReset">
+
+                Limpiar filtros
+
+            </button>
+
+        </section>
+
+
+        <section
+            class="kpis"
+            id="kpis">
+
+        </section>
+
+
+        <section class="dashboard-grid">
+
+            <div class="card">
+
+                <h3>
+
+                    Producción diaria
+
+                </h3>
+
+                <canvas
+                    id="dailyChart">
+                </canvas>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+
+                    Distribución
+
+                </h3>
+
+                <div
+                    id="distribution">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-grid">
+
+            <div class="card">
+
+                <h3>
+
+                    Top WO
+
+                </h3>
+
+                <div
+                    id="topWO">
+
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+
+                    Top Categorías
+
+                </h3>
+
+                <div
+                    id="topCategories">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <h3>
+
+                Indicadores del periodo
+
+            </h3>
+
+            <div
+                id="periodInfo">
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <h3>
+
+                Registros
+
+            </h3>
+
+            <div
+                id="tableContainer">
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+js/utils.jsscript>
+
+js/filters.jsscript>
+
+js/charts.jsscript>
+
+js/tables.jsscript>
+
+js/app.jsscript>
+
+</body>
+</html>
+:root{
+
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --border:#e4e9f0;
+
+  --primary:#1f4f78;
+  --primary-2:#2d6f9f;
+
+  --text:#182230;
+  --muted:#6c798b;
+
+  --success:#2f8f62;
+  --warning:#c48b1f;
+  --danger:#d04a4a;
+
+  --shadow:
+    0 12px 30px rgba(
+      15,
+      35,
+      55,
+      .08
+    );
+
+  --radius:14px;
+
+}
+
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+
+  background:var(--bg);
+
+  color:var(--text);
+
+  font-family:
+    Inter,
+    Segoe UI,
+    Arial,
+    sans-serif;
+}
+
+.app{
+
+  display:flex;
+
+  min-height:100vh;
+}
+
+/* ---------------- */
+/* MENU LATERAL     */
+/* ---------------- */
+
+.sidebar{
+
+  width:260px;
+
+  background:#172331;
+
+  color:white;
+
+  padding:24px 18px;
+
+  position:sticky;
+
+  top:0;
+
+  height:100vh;
+}
+
+.logo{
+
+  font-size:22px;
+
+  font-weight:800;
+
+  letter-spacing:.8px;
+}
+
+.subtitle{
+
+  margin-top:6px;
+
+  color:#aab8c7;
+
+  font-size:13px;
+}
+
+#nav{
+
+  margin-top:25px;
+}
+
+#nav button{
+
+  width:100%;
+
+  border:0;
+
+  background:transparent;
+
+  color:#d9e2ec;
+
+  text-align:left;
+
+  padding:12px;
+
+  border-radius:10px;
+
+  margin-bottom:5px;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+#nav button:hover{
+
+  background:#25415b;
+}
+
+#nav button.active{
+
+  background:#2d6f9f;
+
+  color:white;
+}
+
+/* ---------------- */
+/* CONTENIDO        */
+/* ---------------- */
+
+main{
+
+  flex:1;
+
+  padding:28px;
+
+  width:100%;
+}
+
+/* ---------------- */
+/* HEADER           */
+/* ---------------- */
+
+.header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:20px;
+
+  margin-bottom:22px;
+}
+
+.header h1{
+
+  font-size:34px;
+
+  margin-bottom:8px;
+}
+
+.header p{
+
+  color:var(--muted);
+}
+
+.last-update{
+
+  background:white;
+
+  border:1px solid
+    var(--border);
+
+  padding:10px 14px;
+
+  border-radius:12px;
+
+  font-size:13px;
+
+  align-self:flex-start;
+}
+
+/* ---------------- */
+/* FILTROS          */
+/* ---------------- */
+
+.filters{
+
+  background:white;
+
+  border:1px solid
+    var(--border);
+
+  box-shadow:var(--shadow);
+
+  border-radius:var(--radius);
+
+  padding:18px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(auto-fit,minmax(180px,1fr));
+
+  gap:12px;
+
+  margin-bottom:20px;
+}
+
+.filters label{
+
+  display:block;
+
+  margin-bottom:5px;
+
+  font-weight:700;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+  text-transform:uppercase;
+}
+
+.filters input,
+.filters select{
+
+  width:100%;
+
+  height:42px;
+
+  border:1px solid
+    #d9e0ea;
+
+  border-radius:9px;
+
+  padding:0 10px;
+
+  background:white;
+}
+
+.filters button{
+
+  border:0;
+
+  border-radius:9px;
+
+  background:var(--primary);
+
+  color:white;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  height:42px;
+
+  align-self:end;
+}
+
+.filters button:hover{
+
+  background:var(--primary-2);
+}
+
+/* ---------------- */
+/* KPIs             */
+/* ---------------- */
+
+.kpis{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(220px,1fr)
+    );
+
+  gap:15px;
+
+  margin-bottom:22px;
+}
+
+.kpi{
+
+  background:white;
+
+  border-radius:var(--radius);
+
+  border:1px solid
+    var(--border);
+
+  box-shadow:var(--shadow);
+
+  padding:20px;
+}
+
+.kpi-label{
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  font-weight:700;
+
+  text-transform:uppercase;
+}
+
+.kpi-value{
+
+  margin-top:8px;
+
+  font-size:36px;
+
+  font-weight:800;
+}
+
+/* ---------------- */
+/* TARJETAS         */
+/* ---------------- */
+
+.card{
+
+  background:white;
+
+  border-radius:var(--radius);
+
+  border:1px solid
+    var(--border);
+
+  box-shadow:var(--shadow);
+
+  padding:18px;
+}
+
+.card h3{
+
+  margin-bottom:14px;
+}
+
+/* ---------------- */
+/* GRID             */
+/* ---------------- */
+
+.dashboard-grid{
+
+  display:grid;
+
+  gap:18px;
+
+  grid-template-columns:
+    2fr
+    1fr;
+
+  margin-bottom:18px;
+}
+
+/* ---------------- */
+/* GRAFICAS         */
+/* ---------------- */
+
+canvas{
+
+  width:100% !important;
+
+  height:360px !important;
+}
+
+/* ---------------- */
+/* TOPS             */
+/* ---------------- */
+
+.top-item{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  padding:10px 0;
+
+  border-bottom:1px solid
+    #edf1f6;
+}
+
+.top-item:last-child{
+
+  border-bottom:0;
+}
+
+.top-name{
+
+  font-weight:600;
+}
+
+.top-value{
+
+  font-weight:800;
+
+  color:var(--primary);
+}
+
+/* ---------------- */
+/* PERIOD INFO      */
+/* ---------------- */
+
+#periodInfo{
+
+  display:grid;
+
+  gap:10px;
+}
+
+.period-row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  border-bottom:1px solid
+    #edf2f6;
+
+  padding:8px 0;
+}
+
+/* ---------------- */
+/* TABLA            */
+/* ---------------- */
+
+.table-wrapper{
+
+  overflow:auto;
+
+  max-height:600px;
+}
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+}
+
+thead th{
+
+  position:sticky;
+
+  top:0;
+
+  background:#f7f9fc;
+
+  z-index:1;
+
+  border-bottom:1px solid
+    var(--border);
+
+  padding:12px;
+
+  text-align:left;
+
+  white-space:nowrap;
+}
+
+tbody td{
+
+  padding:11px;
+
+  border-bottom:1px solid
+    #edf2f6;
+}
+
+tbody tr:hover{
+
+  background:#f8fbff;
+}
+
+/* ---------------- */
+/* BADGES           */
+/* ---------------- */
+
+.tag{
+
+  display:inline-block;
+
+  background:#eef5fb;
+
+  color:var(--primary);
+
+  padding:3px 8px;
+
+  border-radius:100px;
+
+  font-size:11px;
+
+  font-weight:700;
+}
+
+/* ---------------- */
+/* BARRAS           */
+/* ---------------- */
+
+.bar{
+
+  width:100%;
+
+  height:12px;
+
+  background:#eef2f6;
+
+  border-radius:999px;
+
+  overflow:hidden;
+}
+
+.bar-fill{
+
+  height:100%;
+
+  background:var(--primary-2);
+
+  border-radius:999px;
+}
+
+/* ---------------- */
+/* RESPONSIVE       */
+/* ---------------- */
+
+@media(max-width:1200px){
+
+  .dashboard-grid{
+
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:900px){
+
+  .app{
+
+    flex-direction:column;
+  }
+
+  .sidebar{
+
+    width:100%;
+
+    height:auto;
+
+    position:relative;
+  }
+
+  main{
+
+    padding:16px;
+  }
+}
+
+@media(max-width:600px){
+
+  .header{
+
+    flex-direction:column;
+  }
+
+  .filters{
+
+    grid-template-columns:1fr;
+  }
+
+  .kpi-value{
+
+    font-size:28px;
+  }
+}
+/* ===========================
+   CONFIGURACIÓN GLOBAL
+=========================== */
+
+const STORAGE_PREFIX =
+  "jv_dashboard_v2_";
+
+
+/* ===========================
+   FORMATO DE FECHAS
+=========================== */
+
+function parseDate(value){
+
+  if(!value)
+    return null;
+
+  if(value instanceof Date)
+    return value;
+
+  let text =
+    String(value).trim();
+
+  if(text.includes("T"))
+    return new Date(text);
+
+  const mx =
+    text.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+  if(mx){
+
+    const day =
+      Number(mx[1]);
+
+    const month =
+      Number(mx[2]);
+
+    const year =
+      Number(mx[3]);
+
+    return new Date(
+      year,
+      month - 1,
+      day
+    );
+  }
+
+  return new Date(text);
+}
+
+
+function formatDate(date){
+
+  const d =
+    parseDate(date);
+
+  if(!d || isNaN(d))
+    return "";
+
+  return d.toLocaleDateString(
+    "es-MX"
+  );
+}
+
+
+function formatDateShort(date){
+
+  const d =
+    parseDate(date);
+
+  if(!d || isNaN(d))
+    return "";
+
+  return d.toLocaleDateString(
+    "es-MX",
+    {
+      day:"2-digit",
+      month:"2-digit"
+    }
+  );
+}
+
+
+function formatDateInput(date){
+
+  const d =
+    parseDate(date);
+
+  if(!d || isNaN(d))
+    return "";
+
+  return d.toISOString()
+    .substring(0,10);
+}
+
+
+/* ===========================
+   NUMEROS
+=========================== */
+
+function num(value){
+
+  const n =
+    Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : 0;
+}
+
+
+function formatNumber(value){
+
+  return new Intl.NumberFormat(
+    "es-MX",
+    {
+      maximumFractionDigits:0
+    }
+  ).format(
+    num(value)
+  );
+}
+
+
+/* ===========================
+   TEXTO
+=========================== */
+
+function cleanText(text){
+
+  if(text === null)
+    return "";
+
+  if(text === undefined)
+    return "";
+
+  return String(text)
+    .trim();
+}
+
+
+function escapeHtml(text){
+
+  return cleanText(text)
+
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
+
+/* ===========================
+   FILTROS PERSISTENTES
+=========================== */
+
+function saveState(
+  key,
+  value
+){
+
+  localStorage.setItem(
+    STORAGE_PREFIX + key,
+    JSON.stringify(value)
+  );
+}
+
+
+function loadState(
+  key,
+  defaultValue = null
+){
+
+  const raw =
+    localStorage.getItem(
+      STORAGE_PREFIX + key
+    );
+
+  if(!raw)
+    return defaultValue;
+
+  try{
+
+    return JSON.parse(raw);
+
+  }catch{
+
+    return defaultValue;
+  }
+}
+
+
+function clearState(){
+
+  Object.keys(localStorage)
+
+    .filter(
+      k =>
+        k.startsWith(
+          STORAGE_PREFIX
+        )
+    )
+
+    .forEach(
+      k =>
+        localStorage.removeItem(k)
+    );
+}
+
+
+/* ===========================
+   FECHAS MIN / MAX
+=========================== */
+
+function getMinDate(rows){
+
+  if(!rows.length)
+    return null;
+
+  return rows
+
+    .map(
+      r =>
+        parseDate(
+          r.FECHA
+        )
+    )
+
+    .filter(Boolean)
+
+    .sort(
+      (a,b) => a - b
+    )[0];
+}
+
+
+function getMaxDate(rows){
+
+  if(!rows.length)
+    return null;
+
+  const arr =
+    rows
+
+      .map(
+        r =>
+          parseDate(
+            r.FECHA
+          )
+      )
+
+      .filter(Boolean)
+
+      .sort(
+        (a,b)=>a-b
+      );
+
+  return arr[
+    arr.length - 1
+  ];
+}
+
+
+/* ===========================
+   ORDENAMIENTO
+=========================== */
+
+function sortRows(
+  rows,
+  direction
+){
+
+  return rows
+    .slice()
+
+    .sort(
+      (a,b)=>{
+
+        const da =
+          parseDate(
+            a.FECHA
+          );
+
+        const db =
+          parseDate(
+            b.FECHA
+          );
+
+        if(direction === "asc")
+          return da - db;
+
+        return db - da;
+      }
+    );
+}
+
+
+/* ===========================
+   UNIQUE VALUES
+=========================== */
+
+function uniqueValues(
+  rows,
+  field
+){
+
+  return [
+
+    ...new Set(
+
+      rows
+
+        .map(
+          r => r[field]
+        )
+
+        .filter(
+          v =>
+            v !== null &&
+            v !== ""
+        )
+
+    )
+
+  ]
+
+  .sort(
+    (a,b)=>
+
+      String(a)
+        .localeCompare(
+          String(b),
+          "es"
+        )
+  );
+}
+
+
+/* ===========================
+   SUMA
+=========================== */
+
+function sumField(
+  rows,
+  field
+){
+
+  return rows.reduce(
+    (total,row)=>
+
+      total +
+      num(
+        row[field]
+      ),
+
+    0
+  );
+}
+
+
+/* ===========================
+   TOP N
+=========================== */
+
+function groupSum(
+  rows,
+  groupField,
+  valueField
+){
+
+  const map = {};
+
+  rows.forEach(row=>{
+
+    const key =
+      cleanText(
+        row[groupField]
+      ) || "Sin dato";
+
+    map[key] =
+      (map[key] || 0) +
+
+      num(
+        row[valueField]
+      );
+  });
+
+  return Object.entries(map)
+
+    .sort(
+      (a,b)=>
+        b[1]-a[1]
+    );
+}
+
+
+function topN(
+  rows,
+  groupField,
+  valueField,
+  limit = 10
+){
+
+  return groupSum(
+    rows,
+    groupField,
+    valueField
+  )
+
+  .slice(
+    0,
+    limit
+  );
+}
+
+
+/* ===========================
+   PERÍODO ACTUAL
+=========================== */
+
+function periodSummary(
+  rows
+){
+
+  if(!rows.length){
+
+    return {
+
+      from:"—",
+      to:"—"
+    };
+  }
+
+  return {
+
+    from:
+      formatDate(
+        getMinDate(rows)
+      ),
+
+    to:
+      formatDate(
+        getMaxDate(rows)
+      )
+  };
+}
+/* =====================================================
+   JV INTERNATIONAL
+   DASHBOARD V2
+   js/filters.js
+
+   Requiere que utils.js se cargue antes.
+
+   Funciones utilizadas desde utils.js:
+   - formatDateInput()
+   - getMinDate()
+   - getMaxDate()
+   - uniqueValues()
+   - parseDate()
+   - saveState()
+   - loadState()
+   - cleanText()
+===================================================== */
+
+
+/* =====================================================
+   ESTADO GENERAL DE FILTROS
+===================================================== */
+
+const FILTER_DEFAULTS = {
+
+  from: "",
+
+  to: "",
+
+  dimension: "",
+
+  value: "",
+
+  order: "asc"
 };
-const depts=['Estampado','Neck','Cuadros','Empaque','Ejemplos','Lavanderia'];
-function esc(x){return String(x??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
-function num(v){let n=Number(v);return Number.isFinite(n)?n:0}function fmt(n){return new Intl.NumberFormat('es-MX',{maximumFractionDigits:0}).format(n)}
-function rows(dept){return DATA[dept]||[]}function visible(r){return true;}
-function dates(rs){return rs.map(r=>r.FECHA).filter(Boolean).sort()}
-function options(rs,key){return [...new Set(rs.map(r=>r[key]).filter(v=>v!==null&&v!==''))].sort((a,b)=>String(a).localeCompare(String(b),'es'))}
-function sum(rs,key){return rs.reduce((a,r)=>a+num(r[key]),0)}
-function filtered(dept){let rs=rows(dept).filter(visible);let f=document.getElementById('fFrom')?.value||'';let t=document.getElementById('fTo')?.value||'';let d=document.getElementById('fDim')?.value||'';let val=document.getElementById('fVal')?.value||'';return rs.filter(r=>(!f||String(r.FECHA)>=f)&&(!t||String(r.FECHA)<=t)&&(!d||String(r[d])===val))}
-function nav(){document.getElementById('nav').innerHTML=['General',...depts].map(d=>`<button class="${current===d?'active':''}" onclick="show('${d}')">${d==='Lavanderia'?'Lavandería':d}</button>`).join('')}
-function header(c){return `<div class="top"><div><h1 class="title">${esc(c.title)}</h1><div class="desc">${esc(c.desc)}</div></div><div class="updated">Datos cargados: ${esc(lastDate())}</div></div>`}
-function lastDate(){let all=depts.flatMap(d=>rows(d).map(r=>r.FECHA).filter(Boolean));return all.sort().at(-1)||'—'}
-function filters(dept){let rs=rows(dept).filter(visible), c=cfg[dept], ds=dates(rs);let min=ds[0]||'',max=ds.at(-1)||'';let opts=c.groups.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('');return `<div class="filters"><div class="field"><label>Desde</label><input id="fFrom" type="date" value="${min}" onchange="renderDept('${dept}')"></div><div class="field"><label>Hasta</label><input id="fTo" type="date" value="${max}" onchange="renderDept('${dept}')"></div><div class="field"><label>Filtrar por</label><select id="fDim" onchange="updateValues('${dept}')"><option value="">Todos</option>${opts}</select></div><div class="field"><label>Valor</label><select id="fVal" onchange="renderDept('${dept}')"><option value="">Todos</option></select></div><button class="btn secondary" onclick="resetFilters('${dept}')">Restablecer</button><button class="btn primary" onclick="downloadCSV('${dept}')">Exportar CSV</button></div>`}
-function updateValues(dept){let rs=rows(dept).filter(visible),dim=document.getElementById('fDim').value,sel=document.getElementById('fVal');sel.innerHTML='<option value="">Todos</option>'+options(rs,dim).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderDept(dept)}
-function resetFilters(dept){renderDept(dept)}
-function kpi(label,val){return `<div class="kpi"><div class="l">${esc(label)}</div><div class="v">${fmt(val)}</div></div>`}
-function groupBars(rs,key,valKey){let m={};rs.forEach(r=>{let k=r[key];if(k===null||k==='')k='Sin dato';m[k]=(m[k]||0)+num(r[valKey])});let arr=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,12),mx=arr[0]?.[1]||1;return `<div class="bars">${arr.map(([k,v])=>`<div class="barrow"><div class="barlabel" title="${esc(k)}">${esc(k)}</div><div class="barbg"><div class="barfill" style="width:${Math.max(2,v/mx*100)}%"></div></div><div class="barval">${fmt(v)}</div></div>`).join('')||'<div class="empty">Sin datos</div>'}</div>`}
-function trend(rs,valKey){let m={};rs.forEach(r=>{if(r.FECHA)m[r.FECHA]=(m[r.FECHA]||0)+num(r[valKey])});let arr=Object.entries(m).sort(),mx=Math.max(...arr.map(x=>x[1]),1);return `<div class="trend">${arr.map(([d,v])=>`<div class="tcol" title="${d}: ${fmt(v)}"><div class="tval">${fmt(v)}</div><div class="tbar" style="height:${Math.max(2,v/mx*190)}px"></div><div class="tdate">${d.slice(5)}</div></div>`).join('')||'<div class="empty">Sin datos</div>'}</div>`}
-function table(dept,rs){let cols=Object.keys(rows(dept)[0]||{}).filter(k=>!/^Visible$/.test(k)&&k!=='Registro visible'&&!k.endsWith('_2')).slice(0,16);return `<div class="tablewrap"><table class="table"><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rs.slice().reverse().map(r=>`<tr>${cols.map(c=>`<td>${esc(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
-function renderDept(dept){current=dept;nav();let c=cfg[dept],rs=filtered(dept);let total=sum(rs,c.value);let wo=0;let down=sum(rs,'TIEMPO MUERTO (MINS)')+sum(rs,'TIEMPO MUERTO');let count=rs.length;let extra=dept==='Lavanderia'?sum(rs,'TOTAL KGS'):dept==='Cuadros'?new Set(rs.map(r=>r['PROCESO']).filter(Boolean)).size:dept==='Ejemplos'?new Set(rs.map(r=>r['CLIENTE']).filter(Boolean)).size:wo;
-let k3=dept==='Lavanderia'?'Total KGS':dept==='Cuadros'?'Procesos':dept==='Ejemplos'?'Clientes':'WO contabilizadas';
-document.getElementById('view').innerHTML=header(c)+filters(dept)+`<div class="kpis">${kpi(c.metric,total)}${kpi(k3,extra)}${kpi('Registros visibles',count)}${kpi('Tiempo muerto (min)',down)}</div><div class="grid"><div class="card"><h3>Producción por fecha</h3>${trend(rs,c.value)}</div><div class="card"><h3>Distribución por ${esc(c.group)}</h3>${groupBars(rs,c.group,c.value)}</div></div><div class="grid"><div class="card"><h3>Detalle por categoría</h3><div id="group2"></div></div><div class="card"><h3>Indicadores del periodo</h3><div class="note">Periodo: <b>${rs.length?rs.map(r=>r.FECHA).filter(Boolean).sort()[0]:'—'}</b> a <b>${rs.length?rs.map(r=>r.FECHA).filter(Boolean).sort().at(-1):'—'}</b></div><div class="note">La aplicación consulta los registros marcados como visibles en el archivo original.</div><div class="note">Total de registros mostrados: <b>${fmt(count)}</b></div></div></div><div class="card"><h3>Registros</h3>${table(dept,rs)}</div><div class="footer">Fuente: Bitacora de Produccion.xlsx · La pestaña “Resumen Direccion” fue excluida.</div>`;
-let second=c.groups.find(x=>x!==c.group);document.getElementById('group2').innerHTML=groupBars(rs,second||c.group,c.value);updateValuesNoRender(dept)}
-function updateValuesNoRender(dept){let dim=document.getElementById('fDim')?.value||'',sel=document.getElementById('fVal');if(!sel)return;let rs=rows(dept).filter(visible);sel.innerHTML='<option value="">Todos</option>'+options(rs,dim).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}
-function show(dept){current=dept;if(dept==='General')renderGeneral();else renderDept(dept)}
-function renderGeneral(){nav();let cards=depts.map(d=>{let c=cfg[d],rs=rows(d).filter(visible),v=sum(rs,c.value);return `<div class="card dept" onclick="show('${d}')"><span class="pill">${d==='Lavanderia'?'LAVANDERÍA':d.toUpperCase()}</span><div class="num">${fmt(v)}</div><div class="desc">${esc(c.metric)}</div><div class="note">${fmt(rs.length)} registros visibles</div></div>`}).join('');document.getElementById('view').innerHTML=`<div class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta web de la bitácora de producción. Selecciona un área para analizar sus indicadores.</div></div><div class="updated">Último registro: ${esc(lastDate())}</div></div><div class="card" style="margin-bottom:16px"><h3>Áreas de producción</h3><div class="deptgrid">${cards}</div></div><div class="grid"><div class="card"><h3>Resumen de actividad</h3>${depts.map(d=>{let c=cfg[d],rs=rows(d).filter(visible),v=sum(rs,c.value);return `<div class="barrow" style="margin:12px 0"><div class="barlabel">${esc(d==='Lavanderia'?'Lavandería':d)}</div><div class="barbg"><div class="barfill" style="width:${Math.max(2,v/Math.max(...depts.map(x=>sum(rows(x).filter(visible),cfg[x].value)),1)*100)}%"></div></div><div class="barval">${fmt(v)}</div></div>`}).join('')}</div><div class="card"><h3>Alcance</h3><div class="note">Incluye Estampado, Neck, Cuadros, Empaque, Ejemplos y Lavandería.</div><div class="note">La pestaña <b>Resumen Direccion</b> no forma parte de esta aplicación.</div><div class="note">Los datos están integrados en la aplicación para consulta. Los datos se actualizan automáticamente desde la bitácora conectada a Google Drive.</div></div></div><div class="footer">Fuente: Bitacora de Produccion.xlsx · Aplicación de consulta</div>`}
-function downloadCSV(dept){let rs=filtered(dept),cols=Object.keys(rows(dept)[0]||{}).filter(k=>k!=='Visible'&&!k.endsWith('_2'));let csv='\ufeff'+[cols.join(','),...rs.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`${dept}_filtrado.csv`;a.click();URL.revokeObjectURL(a.href)}
-fetch('data.json?v=' + Date.now()).then(r=>r.json()).then(d=>{DATA=d;renderGeneral()}).catch(e=>{document.getElementById('view').innerHTML='<div class="card"><h2>No se pudo cargar data.json</h2><p>Verifica que data.json esté en la misma carpeta que index.html.</p></div>'});
-</script></body></html>
+
+
+let FILTER_CONTEXT = {
+
+  department: "",
+
+  rows: [],
+
+  dimensions: [],
+
+  state: {
+    ...FILTER_DEFAULTS
+  },
+
+  onChange: null
+};
+
+
+/* =====================================================
+   OBTENER CONTROLES
+===================================================== */
+
+function getFilterControls() {
+
+  return {
+
+    from:
+      document.getElementById(
+        "filterFrom"
+      ),
+
+    to:
+      document.getElementById(
+        "filterTo"
+      ),
+
+    dimension:
+      document.getElementById(
+        "filterDimension"
+      ),
+
+    value:
+      document.getElementById(
+        "filterValue"
+      ),
+
+    order:
+      document.getElementById(
+        "filterOrder"
+      ),
+
+    reset:
+      document.getElementById(
+        "btnReset"
+      )
+  };
+}
+
+
+/* =====================================================
+   CLAVE DE ALMACENAMIENTO
+===================================================== */
+
+function getFilterStorageKey(
+  department
+) {
+
+  return (
+    "filters_" +
+    cleanText(department)
+  );
+}
+
+
+/* =====================================================
+   ESTADO GUARDADO POR DEPARTAMENTO
+===================================================== */
+
+function loadDepartmentFilterState(
+  department
+) {
+
+  const saved =
+    loadState(
+      getFilterStorageKey(
+        department
+      ),
+      null
+    );
+
+  if (!saved) {
+
+    return {
+      ...FILTER_DEFAULTS
+    };
+  }
+
+  return {
+
+    from:
+      saved.from || "",
+
+    to:
+      saved.to || "",
+
+    dimension:
+      saved.dimension || "",
+
+    value:
+      saved.value || "",
+
+    order:
+      saved.order === "desc"
+        ? "desc"
+        : "asc"
+  };
+}
+
+
+function saveDepartmentFilterState() {
+
+  if (
+    !FILTER_CONTEXT.department
+  ) {
+    return;
+  }
+
+  saveState(
+    getFilterStorageKey(
+      FILTER_CONTEXT.department
+    ),
+    FILTER_CONTEXT.state
+  );
+}
+
+
+/* =====================================================
+   NORMALIZAR CONFIGURACIÓN DE DIMENSIONES
+===================================================== */
+
+function normalizeDimensions(
+  dimensions
+) {
+
+  if (
+    !Array.isArray(dimensions)
+  ) {
+    return [];
+  }
+
+  return dimensions
+
+    .map(
+      item => {
+
+        if (
+          typeof item === "string"
+        ) {
+
+          return {
+
+            value: item,
+
+            label: item
+          };
+        }
+
+        if (
+          item &&
+          typeof item === "object"
+        ) {
+
+          const value =
+            item.value ||
+            item.field ||
+            item.key ||
+            "";
+
+          const label =
+            item.label ||
+            item.title ||
+            value;
+
+          return {
+
+            value:
+              cleanText(value),
+
+            label:
+              cleanText(label)
+          };
+        }
+
+        return null;
+      }
+    )
+
+    .filter(
+      item =>
+        item &&
+        item.value
+    );
+}
+
+
+/* =====================================================
+   INICIALIZAR FILTROS
+===================================================== */
+
+function initializeFilters(
+  options
+) {
+
+  const config =
+    options || {};
+
+  FILTER_CONTEXT.department =
+    cleanText(
+      config.department
+    );
+
+  FILTER_CONTEXT.rows =
+    Array.isArray(config.rows)
+      ? config.rows.slice()
+      : [];
+
+  FILTER_CONTEXT.dimensions =
+    normalizeDimensions(
+      config.dimensions
+    );
+
+  FILTER_CONTEXT.onChange =
+    typeof config.onChange ===
+    "function"
+      ? config.onChange
+      : null;
+
+  FILTER_CONTEXT.state =
+    loadDepartmentFilterState(
+      FILTER_CONTEXT.department
+    );
+
+  ensureValidFilterState();
+
+  renderFilterControls();
+
+  bindFilterEvents();
+
+  applyFilterChange(
+    false
+  );
+}
+
+
+/* =====================================================
+   ACTUALIZAR FILTROS AL CAMBIAR DE ÁREA
+===================================================== */
+
+function updateFilters(options) {
+
+  initializeFilters(
+    options
+  );
+}
+
+
+/* =====================================================
+   VALIDAR ESTADO
+===================================================== */
+
+function ensureValidFilterState() {
+
+  const rows =
+    FILTER_CONTEXT.rows;
+
+  const dimensions =
+    FILTER_CONTEXT.dimensions;
+
+  const state =
+    FILTER_CONTEXT.state;
+
+  const minimumDate =
+    getMinDate(rows);
+
+  const maximumDate =
+    getMaxDate(rows);
+
+  const minimumInput =
+    formatDateInput(
+      minimumDate
+    );
+
+  const maximumInput =
+    formatDateInput(
+      maximumDate
+    );
+
+  if (
+    !state.from ||
+    !isValidDateInput(
+      state.from
+    )
+  ) {
+
+    state.from =
+      minimumInput;
+  }
+
+  if (
+    !state.to ||
+    !isValidDateInput(
+      state.to
+    )
+  ) {
+
+    state.to =
+      maximumInput;
+  }
+
+  if (
+    state.from &&
+    minimumInput &&
+    state.from < minimumInput
+  ) {
+
+    state.from =
+      minimumInput;
+  }
+
+  if (
+    state.to &&
+    maximumInput &&
+    state.to > maximumInput
+  ) {
+
+    state.to =
+      maximumInput;
+  }
+
+  if (
+    state.from &&
+    state.to &&
+    state.from > state.to
+  ) {
+
+    const temporary =
+      state.from;
+
+    state.from =
+      state.to;
+
+    state.to =
+      temporary;
+  }
+
+  const dimensionExists =
+    dimensions.some(
+      item =>
+        item.value ===
+        state.dimension
+    );
+
+  if (
+    !dimensionExists
+  ) {
+
+    state.dimension =
+      dimensions[0]
+        ? dimensions[0].value
+        : "";
+  }
+
+  const availableValues =
+    getAvailableFilterValues(
+      state.dimension,
+      {
+        ignoreSelectedValue: true
+      }
+    );
+
+  if (
+    state.value &&
+    !availableValues.some(
+      item =>
+        String(item) ===
+        String(state.value)
+    )
+  ) {
+
+    state.value = "";
+  }
+
+  if (
+    state.order !== "asc" &&
+    state.order !== "desc"
+  ) {
+
+    state.order = "asc";
+  }
+}
+
+
+/* =====================================================
+   RENDERIZAR CONTROLES
+===================================================== */
+
+function renderFilterControls() {
+
+  const controls =
+    getFilterControls();
+
+  if (
+    !controls.from ||
+    !controls.to ||
+    !controls.dimension ||
+    !controls.value ||
+    !controls.order
+  ) {
+
+    console.warn(
+      "No se encontraron todos los controles de filtros."
+    );
+
+    return;
+  }
+
+  const rows =
+    FILTER_CONTEXT.rows;
+
+  const state =
+    FILTER_CONTEXT.state;
+
+  const minimumDate =
+    formatDateInput(
+      getMinDate(rows)
+    );
+
+  const maximumDate =
+    formatDateInput(
+      getMaxDate(rows)
+    );
+
+  controls.from.min =
+    minimumDate;
+
+  controls.from.max =
+    maximumDate;
+
+  controls.to.min =
+    minimumDate;
+
+  controls.to.max =
+    maximumDate;
+
+  controls.from.value =
+    state.from;
+
+  controls.to.value =
+    state.to;
+
+  renderDimensionOptions();
+
+  renderValueOptions();
+
+  controls.order.value =
+    state.order;
+}
+
+
+/* =====================================================
+   OPCIONES DE CATEGORÍA
+===================================================== */
+
+function renderDimensionOptions() {
+
+  const controls =
+    getFilterControls();
+
+  if (
+    !controls.dimension
+  ) {
+    return;
+  }
+
+  const dimensions =
+    FILTER_CONTEXT.dimensions;
+
+  const selected =
+    FILTER_CONTEXT.state
+      .dimension;
+
+  if (
+    !dimensions.length
+  ) {
+
+    controls.dimension.innerHTML =
+      '<option value="">' +
+      "Sin categorías" +
+      "</option>";
+
+    controls.dimension.disabled =
+      true;
+
+    return;
+  }
+
+  controls.dimension.disabled =
+    false;
+
+  controls.dimension.innerHTML =
+    dimensions
+
+      .map(
+        item => {
+
+          const isSelected =
+            item.value === selected
+              ? " selected"
+              : "";
+
+          return (
+            '<option value="' +
+            escapeAttribute(
+              item.value
+            ) +
+            '"' +
+            isSelected +
+            ">" +
+            escapeFilterText(
+              item.label
+            ) +
+            "</option>"
+          );
+        }
+      )
+
+      .join("");
+}
+
+
+/* =====================================================
+   OPCIONES DE VALOR
+===================================================== */
+
+function renderValueOptions() {
+
+  const controls =
+    getFilterControls();
+
+  if (
+    !controls.value
+  ) {
+    return;
+  }
+
+  const dimension =
+    FILTER_CONTEXT.state
+      .dimension;
+
+  const selected =
+    FILTER_CONTEXT.state.value;
+
+  if (
+    !dimension
+  ) {
+
+    controls.value.innerHTML =
+      '<option value="">' +
+      "Todos" +
+      "</option>";
+
+    controls.value.disabled =
+      true;
+
+    return;
+  }
+
+  const values =
+    getAvailableFilterValues(
+      dimension,
+      {
+        ignoreSelectedValue: true
+      }
+    );
+
+  controls.value.disabled =
+    false;
+
+  controls.value.innerHTML =
+
+    '<option value="">' +
+    "Todos" +
+    "</option>" +
+
+    values
+
+      .map(
+        value => {
+
+          const text =
+            cleanText(value);
+
+          const isSelected =
+            String(value) ===
+            String(selected)
+              ? " selected"
+              : "";
+
+          return (
+            '<option value="' +
+            escapeAttribute(text) +
+            '"' +
+            isSelected +
+            ">" +
+            escapeFilterText(
+              text
+            ) +
+            "</option>"
+          );
+        }
+      )
+
+      .join("");
+}
+
+
+/* =====================================================
+   OBTENER VALORES DISPONIBLES
+===================================================== */
+
+function getAvailableFilterValues(
+  dimension,
+  options
+) {
+
+  const config =
+    options || {};
+
+  const sourceRows =
+    config.ignoreSelectedValue
+      ? filterRowsByDate(
+          FILTER_CONTEXT.rows
+        )
+      : getFilteredRows();
+
+  if (
+    !dimension
+  ) {
+    return [];
+  }
+
+  return uniqueValues(
+    sourceRows,
+    dimension
+  );
+}
+
+
+/* =====================================================
+   VINCULAR EVENTOS
+===================================================== */
+
+function bindFilterEvents() {
+
+  const controls =
+    getFilterControls();
+
+  if (
+    controls.from
+  ) {
+
+    controls.from.onchange =
+      handleDateFilterChange;
+  }
+
+  if (
+    controls.to
+  ) {
+
+    controls.to.onchange =
+      handleDateFilterChange;
+  }
+
+  if (
+    controls.dimension
+  ) {
+
+    controls.dimension.onchange =
+      handleDimensionChange;
+  }
+
+  if (
+    controls.value
+  ) {
+
+    controls.value.onchange =
+      handleValueChange;
+  }
+
+  if (
+    controls.order
+  ) {
+
+    controls.order.onchange =
+      handleOrderChange;
+  }
+
+  if (
+    controls.reset
+  ) {
+
+    controls.reset.onclick =
+      resetFilters;
+  }
+}
+
+
+/* =====================================================
+   EVENTOS
+===================================================== */
+
+function handleDateFilterChange() {
+
+  const controls =
+    getFilterControls();
+
+  FILTER_CONTEXT.state.from =
+    controls.from
+      ? controls.from.value
+      : "";
+
+  FILTER_CONTEXT.state.to =
+    controls.to
+      ? controls.to.value
+      : "";
+
+  if (
+    FILTER_CONTEXT.state.from &&
+    FILTER_CONTEXT.state.to &&
+    FILTER_CONTEXT.state.from >
+    FILTER_CONTEXT.state.to
+  ) {
+
+    const temporary =
+      FILTER_CONTEXT.state.from;
+
+    FILTER_CONTEXT.state.from =
+      FILTER_CONTEXT.state.to;
+
+    FILTER_CONTEXT.state.to =
+      temporary;
+
+    if (
+      controls.from
+    ) {
+
+      controls.from.value =
+        FILTER_CONTEXT.state.from;
+    }
+
+    if (
+      controls.to
+    ) {
+
+      controls.to.value =
+        FILTER_CONTEXT.state.to;
+    }
+  }
+
+  const validValues =
+    getAvailableFilterValues(
+      FILTER_CONTEXT.state.dimension,
+      {
+        ignoreSelectedValue: true
+      }
+    );
+
+  if (
+    FILTER_CONTEXT.state.value &&
+    !validValues.some(
+      item =>
+        String(item) ===
+        String(
+          FILTER_CONTEXT.state.value
+        )
+    )
+  ) {
+
+    FILTER_CONTEXT.state.value =
+      "";
+  }
+
+  renderValueOptions();
+
+  applyFilterChange();
+}
+
+
+function handleDimensionChange() {
+
+  const controls =
+    getFilterControls();
+
+  FILTER_CONTEXT.state.dimension =
+    controls.dimension
+      ? controls.dimension.value
+      : "";
+
+  FILTER_CONTEXT.state.value =
+    "";
+
+  renderValueOptions();
+
+  applyFilterChange();
+}
+
+
+function handleValueChange() {
+
+  const controls =
+    getFilterControls();
+
+  FILTER_CONTEXT.state.value =
+    controls.value
+      ? controls.value.value
+      : "";
+
+  applyFilterChange();
+}
+
+
+function handleOrderChange() {
+
+  const controls =
+    getFilterControls();
+
+  FILTER_CONTEXT.state.order =
+    controls.order &&
+    controls.order.value === "desc"
+      ? "desc"
+      : "asc";
+
+  applyFilterChange();
+}
+
+
+/* =====================================================
+   RESTABLECER FILTROS
+===================================================== */
+
+function resetFilters() {
+
+  const rows =
+    FILTER_CONTEXT.rows;
+
+  const defaultDimension =
+    FILTER_CONTEXT.dimensions[0]
+      ? FILTER_CONTEXT
+          .dimensions[0]
+          .value
+      : "";
+
+  FILTER_CONTEXT.state = {
+
+    from:
+      formatDateInput(
+        getMinDate(rows)
+      ),
+
+    to:
+      formatDateInput(
+        getMaxDate(rows)
+      ),
+
+    dimension:
+      defaultDimension,
+
+    value: "",
+
+    order: "asc"
+  };
+
+  saveDepartmentFilterState();
+
+  renderFilterControls();
+
+  applyFilterChange();
+}
+
+
+/* =====================================================
+   APLICAR FILTROS
+===================================================== */
+
+function getFilteredRows() {
+
+  let result =
+    filterRowsByDate(
+      FILTER_CONTEXT.rows
+    );
+
+  const dimension =
+    FILTER_CONTEXT.state
+      .dimension;
+
+  const selectedValue =
+    FILTER_CONTEXT.state
+      .value;
+
+  if (
+    dimension &&
+    selectedValue !== ""
+  ) {
+
+    result =
+      result.filter(
+        row =>
+          String(
+            row[dimension] ?? ""
+          ) ===
+          String(
+            selectedValue
+          )
+      );
+  }
+
+  return sortRows(
+    result,
+    FILTER_CONTEXT.state.order
+  );
+}
+
+
+/* =====================================================
+   FILTRAR POR FECHA
+===================================================== */
+
+function filterRowsByDate(
+  rows
+) {
+
+  const from =
+    FILTER_CONTEXT.state.from;
+
+  const to =
+    FILTER_CONTEXT.state.to;
+
+  return rows.filter(
+    row => {
+
+      const inputDate =
+        getDateInputFromValue(
+          row.FECHA
+        );
+
+      if (
+        !inputDate
+      ) {
+        return false;
+      }
+
+      if (
+        from &&
+        inputDate < from
+      ) {
+        return false;
+      }
+
+      if (
+        to &&
+        inputDate > to
+      ) {
+        return false;
+      }
+
+      return true;
+    }
+  );
+}
+
+
+/* =====================================================
+   NOTIFICAR CAMBIOS
+===================================================== */
+
+function applyFilterChange(
+  persist = true
+) {
+
+  if (
+    persist
+  ) {
+
+    saveDepartmentFilterState();
+  }
+
+  const filteredRows =
+    getFilteredRows();
+
+  const detail = {
+
+    department:
+      FILTER_CONTEXT.department,
+
+    rows:
+      filteredRows,
+
+    state: {
+      ...FILTER_CONTEXT.state
+    },
+
+    totalRows:
+      FILTER_CONTEXT.rows.length,
+
+    filteredRows:
+      filteredRows.length
+  };
+
+  if (
+    FILTER_CONTEXT.onChange
+  ) {
+
+    FILTER_CONTEXT.onChange(
+      detail
+    );
+  }
+
+  document.dispatchEvent(
+    new CustomEvent(
+      "dashboardFiltersChanged",
+      {
+        detail: detail
+      }
+    )
+  );
+
+  return detail;
+}
+
+
+/* =====================================================
+   ESTADO PÚBLICO
+===================================================== */
+
+function getFilterState() {
+
+  return {
+    ...FILTER_CONTEXT.state
+  };
+}
+
+
+function setFilterState(
+  newState,
+  refresh = true
+) {
+
+  FILTER_CONTEXT.state = {
+
+    ...FILTER_CONTEXT.state,
+
+    ...(newState || {})
+  };
+
+  ensureValidFilterState();
+
+  renderFilterControls();
+
+  if (
+    refresh
+  ) {
+
+    applyFilterChange();
+  }
+}
+
+
+/* =====================================================
+   CAMBIAR FILAS SIN PERDER FILTROS
+===================================================== */
+
+function replaceFilterRows(
+  rows,
+  refresh = true
+) {
+
+  FILTER_CONTEXT.rows =
+    Array.isArray(rows)
+      ? rows.slice()
+      : [];
+
+  ensureValidFilterState();
+
+  renderFilterControls();
+
+  if (
+    refresh
+  ) {
+
+    applyFilterChange();
+  }
+}
+
+
+/* =====================================================
+   CAMBIAR DIMENSIONES
+===================================================== */
+
+function replaceFilterDimensions(
+  dimensions,
+  refresh = true
+) {
+
+  FILTER_CONTEXT.dimensions =
+    normalizeDimensions(
+      dimensions
+    );
+
+  ensureValidFilterState();
+
+  renderFilterControls();
+
+  if (
+    refresh
+  ) {
+
+    applyFilterChange();
+  }
+}
+
+
+/* =====================================================
+   UTILIDADES INTERNAS
+===================================================== */
+
+function getDateInputFromValue(
+  value
+) {
+
+  if (
+    !value
+  ) {
+    return "";
+  }
+
+  const date =
+    parseDate(value);
+
+  if (
+    !date ||
+    isNaN(date)
+  ) {
+    return "";
+  }
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return (
+    year +
+    "-" +
+    month +
+    "-" +
+    day
+  );
+}
+
+
+function isValidDateInput(
+  value
+) {
+
+  return /^\d{4}-\d{2}-\d{2}$/
+    .test(
+      String(value || "")
+    );
+}
+
+
+function escapeFilterText(
+  value
+) {
+
+  if (
+    typeof escapeHtml ===
+    "function"
+  ) {
+
+    return escapeHtml(value);
+  }
+
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+
+function escapeAttribute(
+  value
+) {
+
+  return escapeFilterText(
+    value
+  );
+}
+initializeFilters({
+
+  department: "Empaque",
+
+  rows: DATA.Empaque,
+
+  dimensions: [
+    {
+      value: "TIPO DE EMPAQUE",
+      label: "Tipo de empaque"
+    },
+    {
+      value: "TIPO DE PRENDA",
+      label: "Tipo de prenda"
+    },
+    {
+      value: "NO. WO",
+      label: "Orden de trabajo"
+    },
+    {
+      value: "ESTILO",
+      label: "Estilo"
+    },
+    {
+      value: "MOTIVO",
+      label: "Motivo"
+    }
+  ],
+
+  onChange: function(result) {
+
+    renderDashboard(
+      result.rows
+    );
+  }
+});
+/* =====================================================
+   JV INTERNATIONAL
+   DASHBOARD DE PRODUCCIÓN V2
+   js/app.js
+
+   Orden requerido en index-v2.html:
+
+   1. utils.js
+   2. filters.js
+   3. charts.js
+   4. tables.js
+   5. app.js
+===================================================== */
+
+
+/* =====================================================
+   ESTADO GLOBAL
+===================================================== */
+
+let DATA = {};
+
+let CURRENT_DEPARTMENT =
+  "Empaque";
+
+let CURRENT_ROWS = [];
+
+let CURRENT_FILTERED_ROWS = [];
+
+let CURRENT_CONFIG = null;
+
+
+/* =====================================================
+   CONFIGURACIÓN DE DEPARTAMENTOS
+===================================================== */
+
+const DEPARTMENT_CONFIG = {
+
+  Estampado: {
+
+    title:
+      "Estampado",
+
+    description:
+      "Producción por fecha, máquina, tipo de prenda, tipo de hit, especialidad y tiempo muerto.",
+
+    metricLabel:
+      "Piezas pintadas",
+
+    valueField:
+      "TOTAL",
+
+    woField:
+      "NO. WO",
+
+    woCountField:
+      "WO Contabilizado",
+
+    timeFields: [
+      "TIEMPO MUERTO (MINS)"
+    ],
+
+    primaryDimension:
+      "NO. MAQUINA",
+
+    dimensions: [
+
+      {
+        value:
+          "NO. MAQUINA",
+
+        label:
+          "Máquina"
+      },
+
+      {
+        value:
+          "TIPO DE PRENDA",
+
+        label:
+          "Tipo de prenda"
+      },
+
+      {
+        value:
+          "TIPO DE HIT",
+
+        label:
+          "Tipo de hit"
+      },
+
+      {
+        value:
+          "ESPECIALIDAD",
+
+        label:
+          "Especialidad"
+      },
+
+      {
+        value:
+          "MOTIVO",
+
+        label:
+          "Motivo"
+      },
+
+      {
+        value:
+          "NO. WO",
+
+        label:
+          "Orden de trabajo"
+      },
+
+      {
+        value:
+          "ESTILO",
+
+        label:
+          "Estilo"
+      }
+    ]
+  },
+
+
+  Neck: {
+
+    title:
+      "Neck",
+
+    description:
+      "Total de piezas por fecha, máquina, tipo de prenda y orden de trabajo.",
+
+    metricLabel:
+      "Total de piezas",
+
+    valueField:
+      "TOTAL",
+
+    woField:
+      "NO. WO",
+
+    woCountField:
+      "WO Contabilizado",
+
+    timeFields: [],
+
+    primaryDimension:
+      "NO. MAQUINA",
+
+    dimensions: [
+
+      {
+        value:
+          "NO. MAQUINA",
+
+        label:
+          "Máquina"
+      },
+
+      {
+        value:
+          "TIPO DE PRENDA",
+
+        label:
+          "Tipo de prenda"
+      },
+
+      {
+        value:
+          "NO. WO",
+
+        label:
+          "Orden de trabajo"
+      },
+
+      {
+        value:
+          "ESTILO",
+
+        label:
+          "Estilo"
+      },
+
+      {
+        value:
+          "COMENTARIOS",
+
+        label:
+          "Comentarios"
+      }
+    ]
+  },
+
+
+  Cuadros: {
+
+    title:
+      "Cuadros",
+
+    description:
+      "Total de cuadros por fecha, proceso, especialidad y departamento.",
+
+    metricLabel:
+      "Total de cuadros",
+
+    valueField:
+      "CANT. CUADROS",
+
+    woField:
+      "NO. WO",
+
+    woCountField:
+      "",
+
+    timeFields: [],
+
+    primaryDimension:
+      "PROCESO",
+
+    dimensions: [
+
+      {
+        value:
+          "PROCESO",
+
+        label:
+          "Proceso"
+      },
+
+      {
+        value:
+          "ESPECIALIDAD",
+
+        label:
+          "Especialidad"
+      },
+
+      {
+        value:
+          "DEPT",
+
+        label:
+          "Departamento"
+      },
+
+      {
+        value:
+          "NO. WO",
+
+        label:
+          "Orden de trabajo"
+      }
+    ]
+  },
+
+
+  Empaque: {
+
+    title:
+      "Empaque",
+
+    description:
+      "Cantidad de piezas por fecha, tipo de empaque, tipo de prenda y orden de trabajo.",
+
+    metricLabel:
+      "Total de piezas",
+
+    valueField:
+      "TOTAL",
+
+    woField:
+      "NO. WO",
+
+    woCountField:
+      "WO Contabilizado",
+
+    timeFields: [
+      "TIEMPO MUERTO"
+    ],
+
+    primaryDimension:
+      "TIPO DE EMPAQUE",
+
+    dimensions: [
+
+      {
+        value:
+          "TIPO DE EMPAQUE",
+
+        label:
+          "Tipo de empaque"
+      },
+
+      {
+        value:
+          "TIPO DE PRENDA",
+
+        label:
+          "Tipo de prenda"
+      },
+
+      {
+        value:
+          "NO. WO",
+
+        label:
+          "Orden de trabajo"
+      },
+
+      {
+        value:
+          "ESTILO",
+
+        label:
+          "Estilo"
+      },
+
+      {
+        value:
+          "MOTIVO",
+
+        label:
+          "Motivo"
+      }
+    ]
+  },
+
+
+  Ejemplos: {
+
+    title:
+      "Ejemplos",
+
+    description:
+      "Prendas trabajadas por fecha, departamento, cliente, tienda y especialidad.",
+
+    metricLabel:
+      "Cantidad de prendas",
+
+    valueField:
+      "PRENDAS",
+
+    woField:
+      "",
+
+    woCountField:
+      "",
+
+    timeFields: [],
+
+    primaryDimension:
+      "DEPTO",
+
+    dimensions: [
+
+      {
+        value:
+          "DEPTO",
+
+        label:
+          "Departamento"
+      },
+
+      {
+        value:
+          "CLIENTE",
+
+        label:
+          "Cliente"
+      },
+
+      {
+        value:
+          "TIENDA",
+
+        label:
+          "Tienda"
+      },
+
+      {
+        value:
+          "ESPECIALIDAD",
+
+        label:
+          "Especialidad"
+      },
+
+      {
+        value:
+          "TIPO DE HIT",
+
+        label:
+          "Tipo de hit"
+      },
+
+      {
+        value:
+          "ESTILO",
+
+        label:
+          "Estilo"
+      }
+    ]
+  },
+
+
+  Lavanderia: {
+
+    title:
+      "Lavandería",
+
+    description:
+      "Producción por fecha, máquina, tipo de prenda, proceso, color, kilos y tiempo muerto.",
+
+    metricLabel:
+      "Producción total",
+
+    valueField:
+      "CANTIDAD DE PIEZAS",
+
+    alternateValueField:
+      "Piezas visibles",
+
+    woField:
+      "NO. WO",
+
+    woCountField:
+      "",
+
+    timeFields: [
+      "TIEMPO MUERTO (MINS)"
+    ],
+
+    primaryDimension:
+      "TIPO DE PROCESO",
+
+    dimensions: [
+
+      {
+        value:
+          "TIPO DE PROCESO",
+
+        label:
+          "Tipo de proceso"
+      },
+
+      {
+        value:
+          "TIPO DE PRENDA",
+
+        label:
+          "Tipo de prenda"
+      },
+
+      {
+        value:
+          "NO. MAQUINA",
+
+        label:
+          "Máquina"
+      },
+
+      {
+        value:
+          "COLOR",
+
+        label:
+          "Color"
+      },
+
+      {
+        value:
+          "MOTIVO",
+
+        label:
+          "Motivo"
+      },
+
+      {
+        value:
+          "NO. WO",
+
+        label:
+          "Orden de trabajo"
+      }
+    ]
+  }
+};
+
+
+const DEPARTMENT_ORDER = [
+
+  "Estampado",
+
+  "Neck",
+
+  "Cuadros",
+
+  "Empaque",
+
+  "Ejemplos",
+
+  "Lavanderia"
+];
+
+
+/* =====================================================
+   INICIO DE LA APLICACIÓN
+===================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeApplication
+);
+
+
+async function initializeApplication() {
+
+  renderLoadingState();
+
+  try {
+
+    await loadDashboardData();
+
+    renderNavigation();
+
+    const initialDepartment =
+      getInitialDepartment();
+
+    showDepartment(
+      initialDepartment
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Error al iniciar el dashboard:",
+      error
+    );
+
+    renderApplicationError(
+      error
+    );
+  }
+}
+
+
+/* =====================================================
+   CARGAR DATA.JSON
+===================================================== */
+
+async function loadDashboardData() {
+
+  const response =
+    await fetch(
+      "data.json?v=" +
+      Date.now(),
+      {
+        cache:
+          "no-store"
+      }
+    );
+
+  if (
+    !response.ok
+  ) {
+
+    throw new Error(
+      "No se pudo cargar data.json. HTTP " +
+      response.status
+    );
+  }
+
+  const result =
+    await response.json();
+
+  if (
+    !result ||
+    typeof result !==
+    "object"
+  ) {
+
+    throw new Error(
+      "data.json no contiene un objeto válido."
+    );
+  }
+
+  DATA = result;
+
+  normalizeAllDepartmentData();
+
+  renderLastUpdate();
+}
+
+
+/* =====================================================
+   NORMALIZAR INFORMACIÓN
+===================================================== */
+
+function normalizeAllDepartmentData() {
+
+  DEPARTMENT_ORDER.forEach(
+    department => {
+
+      const rows =
+        Array.isArray(
+          DATA[department]
+        )
+          ? DATA[department]
+          : [];
+
+      DATA[department] =
+        rows.map(
+          normalizeRow
+        );
+    }
+  );
+}
+
+
+function normalizeRow(row) {
+
+  const result = {};
+
+  Object.keys(
+    row || {}
+  ).forEach(
+    key => {
+
+      const normalizedKey =
+        cleanText(key);
+
+      result[
+        normalizedKey
+      ] =
+        row[key];
+    }
+  );
+
+  if (
+    result.FECHA
+  ) {
+
+    result.__date =
+      parseDate(
+        result.FECHA
+      );
+
+    result.__dateInput =
+      getDateInputFromValue(
+        result.FECHA
+      );
+  }
+
+  return result;
+}
+
+
+/* =====================================================
+   DEPARTAMENTO INICIAL
+===================================================== */
+
+function getInitialDepartment() {
+
+  const saved =
+    loadState(
+      "current_department",
+      ""
+    );
+
+  if (
+    saved &&
+    DEPARTMENT_CONFIG[saved]
+  ) {
+
+    return saved;
+  }
+
+  const available =
+    DEPARTMENT_ORDER.find(
+      department =>
+        Array.isArray(
+          DATA[department]
+        ) &&
+        DATA[department].length
+    );
+
+  return (
+    available ||
+    "Empaque"
+  );
+}
+
+
+/* =====================================================
+   NAVEGACIÓN
+===================================================== */
+
+function renderNavigation() {
+
+  const navigation =
+    document.getElementById(
+      "nav"
+    );
+
+  if (
+    !navigation
+  ) {
+    return;
+  }
+
+  navigation.innerHTML =
+    DEPARTMENT_ORDER
+
+      .map(
+        department => {
+
+          const configuration =
+            DEPARTMENT_CONFIG[
+              department
+            ];
+
+          return (
+            '<button ' +
+            'type="button" ' +
+            'data-department="' +
+            escapeAttribute(
+              department
+            ) +
+            '" ' +
+            'onclick="showDepartment(\'' +
+            escapeJavaScriptString(
+              department
+            ) +
+            '\')">' +
+            escapeHtml(
+              configuration.title
+            ) +
+            "</button>"
+          );
+        }
+      )
+
+      .join("");
+
+  updateActiveNavigation();
+}
+
+
+function updateActiveNavigation() {
+
+  document
+    .querySelectorAll(
+      "#nav button"
+    )
+    .forEach(
+      button => {
+
+        const department =
+          button.dataset
+            .department;
+
+        button.classList.toggle(
+          "active",
+          department ===
+          CURRENT_DEPARTMENT
+        );
+      }
+    );
+}
+
+
+/* =====================================================
+   CAMBIAR DE DEPARTAMENTO
+===================================================== */
+
+function showDepartment(
+  department
+) {
+
+  if (
+    !DEPARTMENT_CONFIG[
+      department
+    ]
+  ) {
+
+    console.warn(
+      "Departamento no configurado:",
+      department
+    );
+
+    return;
+  }
+
+  CURRENT_DEPARTMENT =
+    department;
+
+  CURRENT_CONFIG =
+    DEPARTMENT_CONFIG[
+      department
+    ];
+
+  CURRENT_ROWS =
+    getDepartmentRows(
+      department
+    );
+
+  saveState(
+    "current_department",
+    department
+  );
+
+  updateActiveNavigation();
+
+  renderDepartmentHeader();
+
+  initializeFilters({
+
+    department:
+      department,
+
+    rows:
+      CURRENT_ROWS,
+
+    dimensions:
+      CURRENT_CONFIG
+        .dimensions,
+
+    onChange:
+      handleFilteredData
+  });
+}
+
+
+function getDepartmentRows(
+  department
+) {
+
+  const rows =
+    Array.isArray(
+      DATA[department]
+    )
+      ? DATA[department]
+      : [];
+
+  return rows
+    .filter(
+      row =>
+        row &&
+        typeof row ===
+        "object"
+    );
+}
+
+
+/* =====================================================
+   ENCABEZADO
+===================================================== */
+
+function renderDepartmentHeader() {
+
+  const title =
+    document.getElementById(
+      "pageTitle"
+    );
+
+  const description =
+    document.getElementById(
+      "pageDescription"
+    );
+
+  if (
+    title
+  ) {
+
+    title.textContent =
+      CURRENT_CONFIG.title;
+  }
+
+  if (
+    description
+  ) {
+
+    description.textContent =
+      CURRENT_CONFIG
+        .description;
+  }
+}
+
+
+function renderLastUpdate() {
+
+  const target =
+    document.getElementById(
+      "lastUpdate"
+    );
+
+  if (
+    !target
+  ) {
+    return;
+  }
+
+  const generatedAt =
+    DATA.generatedAt;
+
+  if (
+    generatedAt
+  ) {
+
+    const date =
+      parseDate(
+        generatedAt
+      );
+
+    if (
+      date &&
+      !isNaN(date)
+    ) {
+
+      target.textContent =
+        date.toLocaleString(
+          "es-MX",
+          {
+            dateStyle:
+              "medium",
+
+            timeStyle:
+              "short"
+          }
+        );
+
+      return;
+    }
+  }
+
+  const dates =
+    DEPARTMENT_ORDER
+
+      .flatMap(
+        department =>
+          getDepartmentRows(
+            department
+          )
+      )
+
+      .map(
+        row =>
+          parseDate(
+            row.FECHA
+          )
+      )
+
+      .filter(
+        date =>
+          date &&
+          !isNaN(date)
+      )
+
+      .sort(
+        (a,b) =>
+          b - a
+      );
+
+  target.textContent =
+    dates.length
+      ? formatDate(
+          dates[0]
+        )
+      : "Sin fecha";
+}
+
+
+/* =====================================================
+   RECEPCIÓN DE FILTROS
+===================================================== */
+
+function handleFilteredData(
+  result
+) {
+
+  CURRENT_FILTERED_ROWS =
+    Array.isArray(
+      result.rows
+    )
+      ? result.rows
+      : [];
+
+  renderDashboard(
+    CURRENT_FILTERED_ROWS,
+    result.state
+  );
+}
+
+
+/* =====================================================
+   RENDERIZAR DASHBOARD
+===================================================== */
+
+function renderDashboard(
+  rows,
+  filterState
+) {
+
+  renderKPIs(
+    rows
+  );
+
+  renderPeriodInformation(
+    rows
+  );
+
+  renderDistribution(
+    rows,
+    filterState
+  );
+
+  renderTopWorkOrders(
+    rows
+  );
+
+  renderTopCategories(
+    rows,
+    filterState
+  );
+
+  if (
+    typeof renderDailyChart ===
+    "function"
+  ) {
+
+    renderDailyChart(
+      rows,
+      CURRENT_CONFIG
+    );
+
+  } else {
+
+    renderChartFallback(
+      rows
+    );
+  }
+
+  if (
+    typeof renderDataTable ===
+    "function"
+  ) {
+
+    renderDataTable(
+      CURRENT_DEPARTMENT,
+      rows,
+      filterState
+    );
+
+  } else {
+
+    renderTableFallback(
+      rows
+    );
+  }
+}
+
+
+/* =====================================================
+   KPIs
+===================================================== */
+
+function renderKPIs(
+  rows
+) {
+
+  const container =
+    document.getElementById(
+      "kpis"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  const total =
+    getDepartmentTotal(
+      rows
+    );
+
+  const secondKPI =
+    getSecondaryKPI(
+      rows
+    );
+
+  const timeValue =
+    getTotalDowntime(
+      rows
+    );
+
+  const cards = [
+
+    {
+      label:
+        CURRENT_CONFIG
+          .metricLabel,
+
+      value:
+        total
+    },
+
+    {
+      label:
+        secondKPI.label,
+
+      value:
+        secondKPI.value
+    },
+
+    {
+      label:
+        "Registros",
+
+      value:
+        rows.length
+    },
+
+    {
+      label:
+        "Tiempo muerto (min)",
+
+      value:
+        timeValue
+    }
+  ];
+
+  container.innerHTML =
+    cards
+
+      .map(
+        item => {
+
+          return (
+            '<article class="kpi">' +
+              '<div class="kpi-label">' +
+                escapeHtml(
+                  item.label
+                ) +
+              "</div>" +
+              '<div class="kpi-value">' +
+                formatNumber(
+                  item.value
+                ) +
+              "</div>" +
+            "</article>"
+          );
+        }
+      )
+
+      .join("");
+}
+
+
+function getDepartmentTotal(
+  rows
+) {
+
+  const primary =
+    sumField(
+      rows,
+      CURRENT_CONFIG
+        .valueField
+    );
+
+  if (
+    primary !== 0 ||
+    !CURRENT_CONFIG
+      .alternateValueField
+  ) {
+
+    return primary;
+  }
+
+  return sumField(
+    rows,
+    CURRENT_CONFIG
+      .alternateValueField
+  );
+}
+
+
+function getSecondaryKPI(
+  rows
+) {
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Cuadros"
+  ) {
+
+    return {
+
+      label:
+        "Cantidad de procesos",
+
+      value:
+        countUniqueValues(
+          rows,
+          "PROCESO"
+        )
+    };
+  }
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Ejemplos"
+  ) {
+
+    return {
+
+      label:
+        "Cantidad de clientes",
+
+      value:
+        countUniqueValues(
+          rows,
+          "CLIENTE"
+        )
+    };
+  }
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Lavanderia"
+  ) {
+
+    return {
+
+      label:
+        "Total KGS",
+
+      value:
+        sumField(
+          rows,
+          "TOTAL KGS"
+        )
+    };
+  }
+
+  const configuredCount =
+    countConfiguredWorkOrders(
+      rows
+    );
+
+  if (
+    configuredCount !== null
+  ) {
+
+    return {
+
+      label:
+        "WO contabilizadas",
+
+      value:
+        configuredCount
+    };
+  }
+
+  return {
+
+    label:
+      "Órdenes de trabajo",
+
+    value:
+      countUniqueValues(
+        rows,
+        CURRENT_CONFIG
+          .woField
+      )
+  };
+}
+
+
+function countConfiguredWorkOrders(
+  rows
+) {
+
+  const field =
+    CURRENT_CONFIG
+      .woCountField;
+
+  if (
+    !field
+  ) {
+    return null;
+  }
+
+  const fieldExists =
+    rows.some(
+      row =>
+        Object.prototype
+          .hasOwnProperty
+          .call(
+            row,
+            field
+          )
+    );
+
+  if (
+    !fieldExists
+  ) {
+    return null;
+  }
+
+  return rows.filter(
+    row =>
+      num(
+        row[field]
+      ) === 1
+  ).length;
+}
+
+
+function countUniqueValues(
+  rows,
+  field
+) {
+
+  if (
+    !field
+  ) {
+    return 0;
+  }
+
+  return new Set(
+
+    rows
+
+      .map(
+        row =>
+          cleanText(
+            row[field]
+          )
+      )
+
+      .filter(Boolean)
+
+  ).size;
+}
+
+
+function getTotalDowntime(
+  rows
+) {
+
+  const fields =
+    CURRENT_CONFIG
+      .timeFields || [];
+
+  return fields.reduce(
+    (total,field) =>
+      total +
+      sumField(
+        rows,
+        field
+      ),
+    0
+  );
+}
+
+
+/* =====================================================
+   INDICADORES DEL PERIODO
+===================================================== */
+
+function renderPeriodInformation(
+  rows
+) {
+
+  const container =
+    document.getElementById(
+      "periodInfo"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  if (
+    !rows.length
+  ) {
+
+    container.innerHTML =
+      '<div class="period-row">' +
+        "<span>Resultado</span>" +
+        "<strong>Sin registros para los filtros seleccionados</strong>" +
+      "</div>";
+
+    return;
+  }
+
+  const summary =
+    periodSummary(
+      rows
+    );
+
+  const daily =
+    getDailyProduction(
+      rows
+    );
+
+  const total =
+    getDepartmentTotal(
+      rows
+    );
+
+  const dayCount =
+    daily.length;
+
+  const average =
+    dayCount
+      ? total / dayCount
+      : 0;
+
+  const maximum =
+    daily.length
+      ? daily.reduce(
+          (best,item) =>
+            item.value >
+            best.value
+              ? item
+              : best,
+          daily[0]
+        )
+      : null;
+
+  const workOrders =
+    countUniqueValues(
+      rows,
+      CURRENT_CONFIG
+        .woField
+    );
+
+  const information = [
+
+    {
+      label:
+        "Periodo analizado",
+
+      value:
+        summary.from +
+        " al " +
+        summary.to
+    },
+
+    {
+      label:
+        "Días con actividad",
+
+      value:
+        formatNumber(
+          dayCount
+        )
+    },
+
+    {
+      label:
+        "Promedio diario",
+
+      value:
+        formatNumber(
+          average
+        ) +
+        " " +
+        getMetricUnit()
+    },
+
+    {
+      label:
+        "Órdenes de trabajo",
+
+      value:
+        formatNumber(
+          workOrders
+        )
+    },
+
+    {
+      label:
+        "Día de mayor producción",
+
+      value:
+        maximum
+          ? formatDate(
+              maximum.date
+            )
+          : "—"
+    },
+
+    {
+      label:
+        "Producción máxima diaria",
+
+      value:
+        maximum
+          ? formatNumber(
+              maximum.value
+            ) +
+            " " +
+            getMetricUnit()
+          : "—"
+    }
+  ];
+
+  container.innerHTML =
+    information
+
+      .map(
+        item => {
+
+          return (
+            '<div class="period-row">' +
+              "<span>" +
+                escapeHtml(
+                  item.label
+                ) +
+              "</span>" +
+              "<strong>" +
+                escapeHtml(
+                  item.value
+                ) +
+              "</strong>" +
+            "</div>"
+          );
+        }
+      )
+
+      .join("");
+}
+
+
+function getMetricUnit() {
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Cuadros"
+  ) {
+    return "cuadros";
+  }
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Ejemplos"
+  ) {
+    return "prendas";
+  }
+
+  if (
+    CURRENT_DEPARTMENT ===
+    "Lavanderia"
+  ) {
+    return "pzas/kg";
+  }
+
+  return "piezas";
+}
+
+
+/* =====================================================
+   PRODUCCIÓN DIARIA
+===================================================== */
+
+function getDailyProduction(
+  rows
+) {
+
+  const grouped = {};
+
+  rows.forEach(
+    row => {
+
+      const dateKey =
+        getDateInputFromValue(
+          row.FECHA
+        );
+
+      if (
+        !dateKey
+      ) {
+        return;
+      }
+
+      grouped[dateKey] =
+        (
+          grouped[dateKey] ||
+          0
+        ) +
+        getRowMetricValue(
+          row
+        );
+    }
+  );
+
+  return Object.entries(
+    grouped
+  )
+
+    .map(
+      ([date,value]) => {
+
+        return {
+
+          date:
+            parseDate(
+              date
+            ),
+
+          dateKey:
+            date,
+
+          value:
+            value
+        };
+      }
+    )
+
+    .sort(
+      (a,b) =>
+        a.date - b.date
+    );
+}
+
+
+function getRowMetricValue(
+  row
+) {
+
+  const primary =
+    num(
+      row[
+        CURRENT_CONFIG
+          .valueField
+      ]
+    );
+
+  if (
+    primary !== 0 ||
+    !CURRENT_CONFIG
+      .alternateValueField
+  ) {
+
+    return primary;
+  }
+
+  return num(
+    row[
+      CURRENT_CONFIG
+        .alternateValueField
+    ]
+  );
+}
+
+
+/* =====================================================
+   DISTRIBUCIÓN
+===================================================== */
+
+function renderDistribution(
+  rows,
+  filterState
+) {
+
+  const container =
+    document.getElementById(
+      "distribution"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  const dimension =
+    filterState &&
+    filterState.dimension
+      ? filterState.dimension
+      : CURRENT_CONFIG
+          .primaryDimension;
+
+  const grouped =
+    groupRowsUsingMetric(
+      rows,
+      dimension
+    ).slice(
+      0,
+      12
+    );
+
+  container.innerHTML =
+    renderHorizontalBars(
+      grouped
+    );
+}
+
+
+/* =====================================================
+   TOP WO
+===================================================== */
+
+function renderTopWorkOrders(
+  rows
+) {
+
+  const container =
+    document.getElementById(
+      "topWO"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  const field =
+    CURRENT_CONFIG
+      .woField;
+
+  if (
+    !field
+  ) {
+
+    container.innerHTML =
+      '<div class="top-item">' +
+        '<span class="top-name">No aplica</span>' +
+      "</div>";
+
+    return;
+  }
+
+  const ranked =
+    groupRowsUsingMetric(
+      rows,
+      field
+    ).slice(
+      0,
+      10
+    );
+
+  container.innerHTML =
+    renderTopList(
+      ranked
+    );
+}
+
+
+/* =====================================================
+   TOP CATEGORÍAS
+===================================================== */
+
+function renderTopCategories(
+  rows,
+  filterState
+) {
+
+  const container =
+    document.getElementById(
+      "topCategories"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  let field =
+    CURRENT_CONFIG
+      .primaryDimension;
+
+  if (
+    filterState &&
+    filterState.dimension
+  ) {
+
+    field =
+      filterState.dimension;
+  }
+
+  const ranked =
+    groupRowsUsingMetric(
+      rows,
+      field
+    ).slice(
+      0,
+      10
+    );
+
+  container.innerHTML =
+    renderTopList(
+      ranked
+    );
+}
+
+
+/* =====================================================
+   AGRUPAR UTILIZANDO MÉTRICA ACTUAL
+===================================================== */
+
+function groupRowsUsingMetric(
+  rows,
+  field
+) {
+
+  const map = {};
+
+  rows.forEach(
+    row => {
+
+      const key =
+        cleanText(
+          row[field]
+        ) || "Sin dato";
+
+      map[key] =
+        (
+          map[key] ||
+          0
+        ) +
+        getRowMetricValue(
+          row
+        );
+    }
+  );
+
+  return Object.entries(
+    map
+  ).sort(
+    (a,b) =>
+      b[1] - a[1]
+  );
+}
+
+
+/* =====================================================
+   LISTAS Y BARRAS
+===================================================== */
+
+function renderTopList(
+  entries
+) {
+
+  if (
+    !entries.length
+  ) {
+
+    return (
+      '<div class="top-item">' +
+        '<span class="top-name">Sin datos</span>' +
+      "</div>"
+    );
+  }
+
+  return entries
+
+    .map(
+      ([name,value]) => {
+
+        return (
+          '<div class="top-item">' +
+            '<span class="top-name">' +
+              escapeHtml(
+                name
+              ) +
+            "</span>" +
+            '<span class="top-value">' +
+              formatNumber(
+                value
+              ) +
+            "</span>" +
+          "</div>"
+        );
+      }
+    )
+
+    .join("");
+}
+
+
+function renderHorizontalBars(
+  entries
+) {
+
+  if (
+    !entries.length
+  ) {
+
+    return (
+      '<div class="top-item">' +
+        '<span class="top-name">Sin datos</span>' +
+      "</div>"
+    );
+  }
+
+  const maximum =
+    Math.max(
+      ...entries.map(
+        item =>
+          item[1]
+      ),
+      1
+    );
+
+  return entries
+
+    .map(
+      ([name,value]) => {
+
+        const percentage =
+          Math.max(
+            1,
+            value /
+            maximum *
+            100
+          );
+
+        return (
+          '<div class="distribution-item">' +
+            '<div class="distribution-header">' +
+              '<span class="top-name">' +
+                escapeHtml(
+                  name
+                ) +
+              "</span>" +
+              '<span class="top-value">' +
+                formatNumber(
+                  value
+                ) +
+              "</span>" +
+            "</div>" +
+            '<div class="bar">' +
+              '<div class="bar-fill" style="width:' +
+                percentage +
+              '%"></div>' +
+            "</div>" +
+          "</div>"
+        );
+      }
+    )
+
+    .join("");
+}
+
+
+/* =====================================================
+   FALLBACK PARA GRÁFICA
+===================================================== */
+
+function renderChartFallback(
+  rows
+) {
+
+  const canvas =
+    document.getElementById(
+      "dailyChart"
+    );
+
+  if (
+    !canvas
+  ) {
+    return;
+  }
+
+  const parent =
+    canvas.parentElement;
+
+  const daily =
+    getDailyProduction(
+      rows
+    );
+
+  const bars =
+    daily
+
+      .map(
+        item => {
+
+          return (
+            '<div class="top-item">' +
+              '<span class="top-name">' +
+                escapeHtml(
+                  formatDate(
+                    item.date
+                  )
+                ) +
+              "</span>" +
+              '<span class="top-value">' +
+                formatNumber(
+                  item.value
+                ) +
+              "</span>" +
+            "</div>"
+          );
+        }
+      )
+
+      .join("");
+
+  canvas.style.display =
+    "none";
+
+  let fallback =
+    parent.querySelector(
+      ".chart-fallback"
+    );
+
+  if (
+    !fallback
+  ) {
+
+    fallback =
+      document.createElement(
+        "div"
+      );
+
+    fallback.className =
+      "chart-fallback";
+
+    parent.appendChild(
+      fallback
+    );
+  }
+
+  fallback.innerHTML =
+    bars ||
+    '<div class="top-item">' +
+      '<span class="top-name">Sin datos</span>' +
+    "</div>";
+}
+
+
+/* =====================================================
+   FALLBACK PARA TABLA
+===================================================== */
+
+function renderTableFallback(
+  rows
+) {
+
+  const container =
+    document.getElementById(
+      "tableContainer"
+    );
+
+  if (
+    !container
+  ) {
+    return;
+  }
+
+  if (
+    !rows.length
+  ) {
+
+    container.innerHTML =
+      "<p>Sin registros para los filtros seleccionados.</p>";
+
+    return;
+  }
+
+  const columns =
+    Object.keys(
+      rows[0]
+    ).filter(
+      key =>
+        !key.startsWith(
+          "__"
+        )
+    );
+
+  container.innerHTML =
+
+    '<div class="table-wrapper">' +
+
+      "<table>" +
+
+        "<thead>" +
+
+          "<tr>" +
+
+            columns
+
+              .map(
+                column =>
+                  "<th>" +
+                    escapeHtml(
+                      column
+                    ) +
+                  "</th>"
+              )
+
+              .join("") +
+
+          "</tr>" +
+
+        "</thead>" +
+
+        "<tbody>" +
+
+          rows
+
+            .map(
+              row => {
+
+                return (
+                  "<tr>" +
+
+                    columns
+
+                      .map(
+                        column => {
+
+                          let value =
+                            row[column];
+
+                          if (
+                            column ===
+                            "FECHA"
+                          ) {
+
+                            value =
+                              formatDate(
+                                value
+                              );
+                          }
+
+                          return (
+                            "<td>" +
+                              escapeHtml(
+                                value
+                              ) +
+                            "</td>"
+                          );
+                        }
+                      )
+
+                      .join("") +
+
+                  "</tr>"
+                );
+              }
+            )
+
+            .join("") +
+
+        "</tbody>" +
+
+      "</table>" +
+
+    "</div>";
+}
+
+
+/* =====================================================
+   ESTADO DE CARGA Y ERRORES
+===================================================== */
+
+function renderLoadingState() {
+
+  const title =
+    document.getElementById(
+      "pageTitle"
+    );
+
+  const description =
+    document.getElementById(
+      "pageDescription"
+    );
+
+  if (
+    title
+  ) {
+
+    title.textContent =
+      "Cargando dashboard";
+  }
+
+  if (
+    description
+  ) {
+
+    description.textContent =
+      "Consultando la información de producción...";
+  }
+}
+
+
+function renderApplicationError(
+  error
+) {
+
+  const title =
+    document.getElementById(
+      "pageTitle"
+    );
+
+  const description =
+    document.getElementById(
+      "pageDescription"
+    );
+
+  if (
+    title
+  ) {
+
+    title.textContent =
+      "No se pudo cargar el dashboard";
+  }
+
+  if (
+    description
+  ) {
+
+    description.textContent =
+      error &&
+      error.message
+        ? error.message
+        : "Ocurrió un error inesperado.";
+  }
+
+  const containers = [
+
+    "kpis",
+
+    "distribution",
+
+    "topWO",
+
+    "topCategories",
+
+    "periodInfo",
+
+    "tableContainer"
+  ];
+
+  containers.forEach(
+    id => {
+
+      const item =
+        document.getElementById(
+          id
+        );
+
+      if (
+        item
+      ) {
+
+        item.innerHTML =
+          "";
+      }
+    }
+  );
+}
+
+
+/* =====================================================
+   UTILIDADES LOCALES
+===================================================== */
+
+function escapeAttribute(
+  value
+) {
+
+  return escapeHtml(
+    value
+  );
+}
+
+
+function escapeJavaScriptString(
+  value
+) {
+
+  return String(
+    value || ""
+  )
+
+    .replaceAll(
+      "\\",
+      "\\\\"
+    )
+
+    .replaceAll(
+      "'",
+      "\\'"
+    )
+
+    .replaceAll(
+      "\n",
+      ""
+    )
+
+    .replaceAll(
+      "\r",
+      ""
+    );
+}
+/* =====================================================
+   JV INTERNATIONAL
+   DASHBOARD DE PRODUCCIÓN V2
+   js/charts.js
+
+   Gráfica diaria en Canvas, sin librerías externas.
+
+   Requiere que utils.js y filters.js se carguen antes.
+
+   Funciones externas utilizadas:
+   - parseDate()
+   - formatDate()
+   - formatDateShort()
+   - formatNumber()
+   - num()
+   - getDateInputFromValue()
+
+   Variables globales utilizadas desde app.js:
+   - CURRENT_CONFIG
+   - CURRENT_DEPARTMENT
+===================================================== */
+
+
+/* =====================================================
+   ESTADO DE LA GRÁFICA
+===================================================== */
+
+const CHART_STATE = {
+
+  canvas: null,
+
+  context: null,
+
+  rows: [],
+
+  config: null,
+
+  points: [],
+
+  dailyData: [],
+
+  hoveredIndex: -1,
+
+  resizeTimer: null,
+
+  resizeObserver: null,
+
+  devicePixelRatio: 1
+};
+
+
+/* =====================================================
+   CONFIGURACIÓN VISUAL
+===================================================== */
+
+const CHART_COLORS = {
+
+  line: "#2d6f9f",
+
+  lineHover: "#1f4f78",
+
+  fillTop:
+    "rgba(45,111,159,0.24)",
+
+  fillBottom:
+    "rgba(45,111,159,0.02)",
+
+  grid:
+    "rgba(108,121,139,0.16)",
+
+  axis:
+    "#687385",
+
+  text:
+    "#465466",
+
+  point:
+    "#2d6f9f",
+
+  pointBorder:
+    "#ffffff",
+
+  tooltipBackground:
+    "rgba(23,35,49,0.96)",
+
+  tooltipText:
+    "#ffffff",
+
+  empty:
+    "#8a96a5"
+};
+
+
+const CHART_LAYOUT = {
+
+  paddingTop: 30,
+
+  paddingRight: 28,
+
+  paddingBottom: 66,
+
+  paddingLeft: 72,
+
+  gridLines: 5,
+
+  pointRadius: 4,
+
+  hoveredPointRadius: 7,
+
+  lineWidth: 3,
+
+  minimumHeight: 320,
+
+  maximumHeight: 430,
+
+  maximumLabels: 12
+};
+
+
+/* =====================================================
+   FUNCIÓN PRINCIPAL
+===================================================== */
+
+function renderDailyChart(
+  rows,
+  config
+) {
+
+  const canvas =
+    document.getElementById(
+      "dailyChart"
+    );
+
+  if (!canvas) {
+
+    console.warn(
+      "No se encontró el canvas #dailyChart."
+    );
+
+    return;
+  }
+
+  CHART_STATE.canvas =
+    canvas;
+
+  CHART_STATE.context =
+    canvas.getContext("2d");
+
+  CHART_STATE.rows =
+    Array.isArray(rows)
+      ? rows.slice()
+      : [];
+
+  CHART_STATE.config =
+    config || {};
+
+  CHART_STATE.hoveredIndex =
+    -1;
+
+  CHART_STATE.dailyData =
+    buildDailyChartData(
+      CHART_STATE.rows,
+      CHART_STATE.config
+    );
+
+  canvas.style.display =
+    "block";
+
+  removeChartFallback();
+
+  prepareCanvas();
+
+  bindChartEvents();
+
+  drawDailyChart();
+
+  observeChartResize();
+}
+
+
+/* =====================================================
+   PREPARAR DATOS DIARIOS
+===================================================== */
+
+function buildDailyChartData(
+  rows,
+  config
+) {
+
+  const grouped = {};
+
+  const valueField =
+    config &&
+    config.valueField
+      ? config.valueField
+      : "";
+
+  const alternateField =
+    config &&
+    config.alternateValueField
+      ? config.alternateValueField
+      : "";
+
+  rows.forEach(
+    row => {
+
+      const dateKey =
+        getChartDateKey(
+          row.FECHA
+        );
+
+      if (!dateKey) {
+        return;
+      }
+
+      let value =
+        num(
+          row[valueField]
+        );
+
+      if (
+        value === 0 &&
+        alternateField
+      ) {
+
+        value =
+          num(
+            row[alternateField]
+          );
+      }
+
+      if (!grouped[dateKey]) {
+
+        grouped[dateKey] = {
+
+          dateKey:
+            dateKey,
+
+          date:
+            parseChartDateKey(
+              dateKey
+            ),
+
+          value:
+            0,
+
+          records:
+            0
+        };
+      }
+
+      grouped[dateKey].value +=
+        value;
+
+      grouped[dateKey].records +=
+        1;
+    }
+  );
+
+  return Object.values(
+    grouped
+  )
+
+    .filter(
+      item =>
+        item.date &&
+        !isNaN(
+          item.date
+        )
+    )
+
+    .sort(
+      (a,b) =>
+        a.date - b.date
+    );
+}
+
+
+/* =====================================================
+   NORMALIZAR FECHA SIN CAMBIO DE ZONA HORARIA
+===================================================== */
+
+function getChartDateKey(
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+  const text =
+    String(value)
+      .trim();
+
+  const isoMatch =
+    text.match(
+      /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+  if (isoMatch) {
+
+    return (
+      isoMatch[1] +
+      "-" +
+      isoMatch[2] +
+      "-" +
+      isoMatch[3]
+    );
+  }
+
+  const slashMatch =
+    text.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+  if (slashMatch) {
+
+    const first =
+      Number(
+        slashMatch[1]
+      );
+
+    const second =
+      Number(
+        slashMatch[2]
+      );
+
+    const year =
+      slashMatch[3];
+
+    /*
+      Para los datos actuales:
+
+      08/21/2026 se interpreta como MM/DD/YYYY.
+      21/08/2026 se interpreta como DD/MM/YYYY.
+      Cuando ambos números son <= 12, se usa MM/DD/YYYY,
+      igual que las fechas originales del archivo.
+    */
+
+    let month;
+    let day;
+
+    if (first > 12) {
+
+      day = first;
+      month = second;
+
+    } else {
+
+      month = first;
+      day = second;
+    }
+
+    return (
+      year +
+      "-" +
+      String(month)
+        .padStart(
+          2,
+          "0"
+        ) +
+      "-" +
+      String(day)
+        .padStart(
+          2,
+          "0"
+        )
+    );
+  }
+
+  const parsed =
+    parseDate(value);
+
+  if (
+    !parsed ||
+    isNaN(parsed)
+  ) {
+    return "";
+  }
+
+  return (
+    parsed.getFullYear() +
+    "-" +
+    String(
+      parsed.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    ) +
+    "-" +
+    String(
+      parsed.getDate()
+    ).padStart(
+      2,
+      "0"
+    )
+  );
+}
+
+
+function parseChartDateKey(
+  dateKey
+) {
+
+  const parts =
+    String(dateKey)
+      .split("-")
+      .map(Number);
+
+  if (
+    parts.length !== 3 ||
+    !parts[0] ||
+    !parts[1] ||
+    !parts[2]
+  ) {
+    return null;
+  }
+
+  return new Date(
+    parts[0],
+    parts[1] - 1,
+    parts[2]
+  );
+}
+
+
+/* =====================================================
+   PREPARAR CANVAS PARA PANTALLAS RETINA
+===================================================== */
+
+function prepareCanvas() {
+
+  const canvas =
+    CHART_STATE.canvas;
+
+  const context =
+    CHART_STATE.context;
+
+  if (
+    !canvas ||
+    !context
+  ) {
+    return;
+  }
+
+  const parent =
+    canvas.parentElement;
+
+  const parentWidth =
+    parent
+      ? parent.clientWidth
+      : 800;
+
+  const cssWidth =
+    Math.max(
+      320,
+      parentWidth - 4
+    );
+
+  const cssHeight =
+    calculateChartHeight(
+      cssWidth
+    );
+
+  const ratio =
+    Math.max(
+      1,
+      window.devicePixelRatio ||
+      1
+    );
+
+  CHART_STATE.devicePixelRatio =
+    ratio;
+
+  canvas.style.width =
+    cssWidth + "px";
+
+  canvas.style.height =
+    cssHeight + "px";
+
+  canvas.width =
+    Math.round(
+      cssWidth * ratio
+    );
+
+  canvas.height =
+    Math.round(
+      cssHeight * ratio
+    );
+
+  context.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
+}
+
+
+function calculateChartHeight(
+  width
+) {
+
+  const calculated =
+    width * 0.42;
+
+  return Math.max(
+    CHART_LAYOUT.minimumHeight,
+    Math.min(
+      CHART_LAYOUT.maximumHeight,
+      calculated
+    )
+  );
+}
+
+
+/* =====================================================
+   DIBUJAR GRÁFICA
+===================================================== */
+
+function drawDailyChart() {
+
+  const canvas =
+    CHART_STATE.canvas;
+
+  const context =
+    CHART_STATE.context;
+
+  if (
+    !canvas ||
+    !context
+  ) {
+    return;
+  }
+
+  const ratio =
+    CHART_STATE.devicePixelRatio;
+
+  const width =
+    canvas.width / ratio;
+
+  const height =
+    canvas.height / ratio;
+
+  context.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  drawChartBackground(
+    context,
+    width,
+    height
+  );
+
+  if (
+    !CHART_STATE.dailyData.length
+  ) {
+
+    drawEmptyChart(
+      context,
+      width,
+      height
+    );
+
+    return;
+  }
+
+  const chartArea =
+    getChartArea(
+      width,
+      height
+    );
+
+  const scale =
+    calculateChartScale(
+      CHART_STATE.dailyData
+    );
+
+  drawGrid(
+    context,
+    chartArea,
+    scale
+  );
+
+  const points =
+    calculatePoints(
+      CHART_STATE.dailyData,
+      chartArea,
+      scale
+    );
+
+  CHART_STATE.points =
+    points;
+
+  drawAreaFill(
+    context,
+    points,
+    chartArea
+  );
+
+  drawLine(
+    context,
+    points
+  );
+
+  drawPoints(
+    context,
+    points
+  );
+
+  drawXAxisLabels(
+    context,
+    points,
+    chartArea
+  );
+
+  drawChartSummary(
+    context,
+    chartArea,
+    scale
+  );
+
+  if (
+    CHART_STATE.hoveredIndex >= 0 &&
+    CHART_STATE.hoveredIndex <
+    points.length
+  ) {
+
+    drawTooltip(
+      context,
+      points[
+        CHART_STATE.hoveredIndex
+      ],
+      width,
+      height
+    );
+  }
+}
+
+
+/* =====================================================
+   FONDO
+===================================================== */
+
+function drawChartBackground(
+  context,
+  width,
+  height
+) {
+
+  context.save();
+
+  context.fillStyle =
+    "#ffffff";
+
+  context.fillRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  context.restore();
+}
+
+
+/* =====================================================
+   ÁREA DE LA GRÁFICA
+===================================================== */
+
+function getChartArea(
+  width,
+  height
+) {
+
+  return {
+
+    left:
+      CHART_LAYOUT.paddingLeft,
+
+    top:
+      CHART_LAYOUT.paddingTop,
+
+    right:
+      width -
+      CHART_LAYOUT.paddingRight,
+
+    bottom:
+      height -
+      CHART_LAYOUT.paddingBottom,
+
+    width:
+      width -
+      CHART_LAYOUT.paddingLeft -
+      CHART_LAYOUT.paddingRight,
+
+    height:
+      height -
+      CHART_LAYOUT.paddingTop -
+      CHART_LAYOUT.paddingBottom
+  };
+}
+
+
+/* =====================================================
+   ESCALA VERTICAL
+===================================================== */
+
+function calculateChartScale(
+  data
+) {
+
+  const rawMaximum =
+    Math.max(
+      ...data.map(
+        item =>
+          item.value
+      ),
+      1
+    );
+
+  const step =
+    calculateNiceStep(
+      rawMaximum /
+      CHART_LAYOUT.gridLines
+    );
+
+  const maximum =
+    step *
+    Math.ceil(
+      rawMaximum /
+      step
+    );
+
+  return {
+
+    minimum: 0,
+
+    maximum:
+      maximum || 1,
+
+    step:
+      step || 1,
+
+    gridLines:
+      Math.ceil(
+        maximum / step
+      )
+  };
+}
+
+
+function calculateNiceStep(
+  rawStep
+) {
+
+  if (
+    !rawStep ||
+    rawStep <= 0
+  ) {
+    return 1;
+  }
+
+  const magnitude =
+    Math.pow(
+      10,
+      Math.floor(
+        Math.log10(
+          rawStep
+        )
+      )
+    );
+
+  const normalized =
+    rawStep /
+    magnitude;
+
+  let niceNormalized;
+
+  if (
+    normalized <= 1
+  ) {
+
+    niceNormalized = 1;
+
+  } else if (
+    normalized <= 2
+  ) {
+
+    niceNormalized = 2;
+
+  } else if (
+    normalized <= 5
+  ) {
+
+    niceNormalized = 5;
+
+  } else {
+
+    niceNormalized = 10;
+  }
+
+  return (
+    niceNormalized *
+    magnitude
+  );
+}
+
+
+/* =====================================================
+   REJILLA Y EJE Y
+===================================================== */
+
+function drawGrid(
+  context,
+  area,
+  scale
+) {
+
+  context.save();
+
+  context.font =
+    "11px Inter, Segoe UI, Arial, sans-serif";
+
+  context.textAlign =
+    "right";
+
+  context.textBaseline =
+    "middle";
+
+  const lineCount =
+    scale.gridLines;
+
+  for (
+    let index = 0;
+    index <= lineCount;
+    index++
+  ) {
+
+    const value =
+      index *
+      scale.step;
+
+    const ratio =
+      value /
+      scale.maximum;
+
+    const y =
+      area.bottom -
+      ratio *
+      area.height;
+
+    context.beginPath();
+
+    context.strokeStyle =
+      CHART_COLORS.grid;
+
+    context.lineWidth =
+      1;
+
+    context.moveTo(
+      area.left,
+      y
+    );
+
+    context.lineTo(
+      area.right,
+      y
+    );
+
+    context.stroke();
+
+    context.fillStyle =
+      CHART_COLORS.axis;
+
+    context.fillText(
+      compactNumber(
+        value
+      ),
+      area.left - 12,
+      y
+    );
+  }
+
+  context.beginPath();
+
+  context.strokeStyle =
+    "rgba(104,115,133,0.30)";
+
+  context.moveTo(
+    area.left,
+    area.top
+  );
+
+  context.lineTo(
+    area.left,
+    area.bottom
+  );
+
+  context.lineTo(
+    area.right,
+    area.bottom
+  );
+
+  context.stroke();
+
+  context.restore();
+}
+
+
+/* =====================================================
+   CALCULAR PUNTOS
+===================================================== */
+
+function calculatePoints(
+  data,
+  area,
+  scale
+) {
+
+  const count =
+    data.length;
+
+  return data.map(
+    (item,index) => {
+
+      const x =
+        count === 1
+          ? area.left +
+            area.width / 2
+          : area.left +
+            index /
+            (count - 1) *
+            area.width;
+
+      const ratio =
+        item.value /
+        scale.maximum;
+
+      const y =
+        area.bottom -
+        ratio *
+        area.height;
+
+      return {
+
+        x:
+          x,
+
+        y:
+          y,
+
+        value:
+          item.value,
+
+        date:
+          item.date,
+
+        dateKey:
+          item.dateKey,
+
+        records:
+          item.records,
+
+        index:
+          index
+      };
+    }
+  );
+}
+
+
+/* =====================================================
+   RELLENO DEL ÁREA
+===================================================== */
+
+function drawAreaFill(
+  context,
+  points,
+  area
+) {
+
+  if (
+    !points.length
+  ) {
+    return;
+  }
+
+  const gradient =
+    context.createLinearGradient(
+      0,
+      area.top,
+      0,
+      area.bottom
+    );
+
+  gradient.addColorStop(
+    0,
+    CHART_COLORS.fillTop
+  );
+
+  gradient.addColorStop(
+    1,
+    CHART_COLORS.fillBottom
+  );
+
+  context.save();
+
+  context.beginPath();
+
+  context.moveTo(
+    points[0].x,
+    area.bottom
+  );
+
+  context.lineTo(
+    points[0].x,
+    points[0].y
+  );
+
+  for (
+    let index = 1;
+    index < points.length;
+    index++
+  ) {
+
+    context.lineTo(
+      points[index].x,
+      points[index].y
+    );
+  }
+
+  context.lineTo(
+    points[
+      points.length - 1
+    ].x,
+    area.bottom
+  );
+
+  context.closePath();
+
+  context.fillStyle =
+    gradient;
+
+  context.fill();
+
+  context.restore();
+}
+
+
+/* =====================================================
+   LÍNEA
+===================================================== */
+
+function drawLine(
+  context,
+  points
+) {
+
+  if (
+    !points.length
+  ) {
+    return;
+  }
+
+  context.save();
+
+  context.beginPath();
+
+  points.forEach(
+    (point,index) => {
+
+      if (
+        index === 0
+      ) {
+
+        context.moveTo(
+          point.x,
+          point.y
+        );
+
+      } else {
+
+        context.lineTo(
+          point.x,
+          point.y
+        );
+      }
+    }
+  );
+
+  context.strokeStyle =
+    CHART_COLORS.line;
+
+  context.lineWidth =
+    CHART_LAYOUT.lineWidth;
+
+  context.lineJoin =
+    "round";
+
+  context.lineCap =
+    "round";
+
+  context.stroke();
+
+  context.restore();
+}
+
+
+/* =====================================================
+   PUNTOS
+===================================================== */
+
+function drawPoints(
+  context,
+  points
+) {
+
+  points.forEach(
+    (point,index) => {
+
+      const hovered =
+        index ===
+        CHART_STATE.hoveredIndex;
+
+      const radius =
+        hovered
+          ? CHART_LAYOUT
+              .hoveredPointRadius
+          : CHART_LAYOUT
+              .pointRadius;
+
+      context.save();
+
+      context.beginPath();
+
+      context.arc(
+        point.x,
+        point.y,
+        radius,
+        0,
+        Math.PI * 2
+      );
+
+      context.fillStyle =
+        hovered
+          ? CHART_COLORS
+              .lineHover
+          : CHART_COLORS.point;
+
+      context.fill();
+
+      context.lineWidth =
+        hovered
+          ? 3
+          : 2;
+
+      context.strokeStyle =
+        CHART_COLORS
+          .pointBorder;
+
+      context.stroke();
+
+      context.restore();
+    }
+  );
+}
+
+
+/* =====================================================
+   ETIQUETAS DEL EJE X
+===================================================== */
+
+function drawXAxisLabels(
+  context,
+  points,
+  area
+) {
+
+  if (
+    !points.length
+  ) {
+    return;
+  }
+
+  const labelIndexes =
+    getVisibleLabelIndexes(
+      points.length
+    );
+
+  context.save();
+
+  context.fillStyle =
+    CHART_COLORS.axis;
+
+  context.font =
+    "11px Inter, Segoe UI, Arial, sans-serif";
+
+  context.textAlign =
+    "center";
+
+  context.textBaseline =
+    "top";
+
+  labelIndexes.forEach(
+    index => {
+
+      const point =
+        points[index];
+
+      const label =
+        formatDateLabel(
+          point.date
+        );
+
+      context.fillText(
+        label,
+        point.x,
+        area.bottom + 14
+      );
+    }
+  );
+
+  context.restore();
+}
+
+
+function getVisibleLabelIndexes(
+  count
+) {
+
+  if (
+    count <=
+    CHART_LAYOUT.maximumLabels
+  ) {
+
+    return Array.from(
+      {
+        length: count
+      },
+      (_,index) =>
+        index
+    );
+  }
+
+  const step =
+    Math.ceil(
+      count /
+      CHART_LAYOUT.maximumLabels
+    );
+
+  const indexes = [];
+
+  for (
+    let index = 0;
+    index < count;
+    index += step
+  ) {
+
+    indexes.push(
+      index
+    );
+  }
+
+  if (
+    indexes[
+      indexes.length - 1
+    ] !==
+    count - 1
+  ) {
+
+    indexes.push(
+      count - 1
+    );
+  }
+
+  return indexes;
+}
+
+
+function formatDateLabel(
+  value
+) {
+
+  const date =
+    value instanceof Date
+      ? value
+      : parseDate(value);
+
+  if (
+    !date ||
+    isNaN(date)
+  ) {
+    return "";
+  }
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const monthNames = [
+
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic"
+  ];
+
+  return (
+    day +
+    " " +
+    monthNames[
+      date.getMonth()
+    ]
+  );
+}
+
+
+/* =====================================================
+   RESUMEN SUPERIOR
+===================================================== */
+
+function drawChartSummary(
+  context,
+  area,
+  scale
+) {
+
+  const total =
+    CHART_STATE.dailyData
+      .reduce(
+        (sum,item) =>
+          sum +
+          item.value,
+        0
+      );
+
+  const maximum =
+    Math.max(
+      ...CHART_STATE
+        .dailyData
+        .map(
+          item =>
+            item.value
+        ),
+      0
+    );
+
+  context.save();
+
+  context.font =
+    "600 11px Inter, Segoe UI, Arial, sans-serif";
+
+  context.fillStyle =
+    CHART_COLORS.text;
+
+  context.textAlign =
+    "left";
+
+  context.textBaseline =
+    "top";
+
+  context.fillText(
+    "Total: " +
+    formatNumber(total),
+    area.left,
+    5
+  );
+
+  context.textAlign =
+    "right";
+
+  context.fillText(
+    "Máximo diario: " +
+    formatNumber(maximum),
+    area.right,
+    5
+  );
+
+  context.restore();
+}
+
+
+/* =====================================================
+   TOOLTIP
+===================================================== */
+
+function drawTooltip(
+  context,
+  point,
+  canvasWidth,
+  canvasHeight
+) {
+
+  const dateText =
+    formatDate(
+      point.date
+    );
+
+  const valueText =
+    formatNumber(
+      point.value
+    ) +
+    " " +
+    getChartMetricUnit();
+
+  const recordText =
+    formatNumber(
+      point.records
+    ) +
+    (
+      point.records === 1
+        ? " registro"
+        : " registros"
+    );
+
+  const padding =
+    12;
+
+  const lineHeight =
+    19;
+
+  context.save();
+
+  context.font =
+    "12px Inter, Segoe UI, Arial, sans-serif";
+
+  const textWidth =
+    Math.max(
+      context.measureText(
+        dateText
+      ).width,
+      context.measureText(
+        valueText
+      ).width,
+      context.measureText(
+        recordText
+      ).width
+    );
+
+  const tooltipWidth =
+    textWidth +
+    padding * 2;
+
+  const tooltipHeight =
+    lineHeight * 3 +
+    padding * 2;
+
+  let x =
+    point.x + 14;
+
+  let y =
+    point.y -
+    tooltipHeight -
+    14;
+
+  if (
+    x +
+    tooltipWidth >
+    canvasWidth - 8
+  ) {
+
+    x =
+      point.x -
+      tooltipWidth -
+      14;
+  }
+
+  if (
+    x < 8
+  ) {
+    x = 8;
+  }
+
+  if (
+    y < 8
+  ) {
+
+    y =
+      point.y + 14;
+  }
+
+  if (
+    y +
+    tooltipHeight >
+    canvasHeight - 8
+  ) {
+
+    y =
+      canvasHeight -
+      tooltipHeight -
+      8;
+  }
+
+  drawRoundedRectangle(
+    context,
+    x,
+    y,
+    tooltipWidth,
+    tooltipHeight,
+    9
+  );
+
+  context.fillStyle =
+    CHART_COLORS
+      .tooltipBackground;
+
+  context.fill();
+
+  context.fillStyle =
+    CHART_COLORS.tooltipText;
+
+  context.textAlign =
+    "left";
+
+  context.textBaseline =
+    "top";
+
+  context.font =
+    "700 12px Inter, Segoe UI, Arial, sans-serif";
+
+  context.fillText(
+    dateText,
+    x + padding,
+    y + padding
+  );
+
+  context.font =
+    "12px Inter, Segoe UI, Arial, sans-serif";
+
+  context.fillText(
+    valueText,
+    x + padding,
+    y + padding +
+    lineHeight
+  );
+
+  context.fillText(
+    recordText,
+    x + padding,
+    y + padding +
+    lineHeight * 2
+  );
+
+  context.restore();
+}
+
+
+function drawRoundedRectangle(
+  context,
+  x,
+  y,
+  width,
+  height,
+  radius
+) {
+
+  const safeRadius =
+    Math.min(
+      radius,
+      width / 2,
+      height / 2
+    );
+
+  context.beginPath();
+
+  context.moveTo(
+    x + safeRadius,
+    y
+  );
+
+  context.lineTo(
+    x +
+    width -
+    safeRadius,
+    y
+  );
+
+  context.quadraticCurveTo(
+    x + width,
+    y,
+    x + width,
+    y + safeRadius
+  );
+
+  context.lineTo(
+    x + width,
+    y +
+    height -
+    safeRadius
+  );
+
+  context.quadraticCurveTo(
+    x + width,
+    y + height,
+    x +
+    width -
+    safeRadius,
+    y + height
+  );
+
+  context.lineTo(
+    x + safeRadius,
+    y + height
+  );
+
+  context.quadraticCurveTo(
+    x,
+    y + height,
+    x,
+    y +
+    height -
+    safeRadius
+  );
+
+  context.lineTo(
+    x,
+    y + safeRadius
+  );
+
+  context.quadraticCurveTo(
+    x,
+    y,
+    x + safeRadius,
+    y
+  );
+
+  context.closePath();
+}
+
+
+/* =====================================================
+   EVENTOS DEL MOUSE
+===================================================== */
+
+function bindChartEvents() {
+
+  const canvas =
+    CHART_STATE.canvas;
+
+  if (!canvas) {
+    return;
+  }
+
+  canvas.onmousemove =
+    handleChartMouseMove;
+
+  canvas.onmouseleave =
+    handleChartMouseLeave;
+
+  canvas.ontouchstart =
+    handleChartTouch;
+
+  canvas.ontouchmove =
+    handleChartTouch;
+}
+
+
+function handleChartMouseMove(
+  event
+) {
+
+  const position =
+    getCanvasPointerPosition(
+      event
+    );
+
+  const nearest =
+    findNearestPoint(
+      position.x,
+      position.y
+    );
+
+  if (
+    nearest !==
+    CHART_STATE.hoveredIndex
+  ) {
+
+    CHART_STATE.hoveredIndex =
+      nearest;
+
+    CHART_STATE.canvas.style.cursor =
+      nearest >= 0
+        ? "pointer"
+        : "default";
+
+    drawDailyChart();
+  }
+}
+
+
+function handleChartMouseLeave() {
+
+  CHART_STATE.hoveredIndex =
+    -1;
+
+  if (
+    CHART_STATE.canvas
+  ) {
+
+    CHART_STATE.canvas.style.cursor =
+      "default";
+  }
+
+  drawDailyChart();
+}
+
+
+function handleChartTouch(
+  event
+) {
+
+  if (
+    !event.touches ||
+    !event.touches.length
+  ) {
+    return;
+  }
+
+  const touch =
+    event.touches[0];
+
+  const position =
+    getCanvasPointerPosition(
+      touch
+    );
+
+  CHART_STATE.hoveredIndex =
+    findNearestPoint(
+      position.x,
+      position.y,
+      34
+    );
+
+  drawDailyChart();
+}
+
+
+function getCanvasPointerPosition(
+  event
+) {
+
+  const rectangle =
+    CHART_STATE.canvas
+      .getBoundingClientRect();
+
+  return {
+
+    x:
+      event.clientX -
+      rectangle.left,
+
+    y:
+      event.clientY -
+      rectangle.top
+  };
+}
+
+
+function findNearestPoint(
+  x,
+  y,
+  maximumDistance = 24
+) {
+
+  let nearestIndex =
+    -1;
+
+  let nearestDistance =
+    Infinity;
+
+  CHART_STATE.points.forEach(
+    (point,index) => {
+
+      const distance =
+        Math.sqrt(
+          Math.pow(
+            point.x - x,
+            2
+          ) +
+          Math.pow(
+            point.y - y,
+            2
+          )
+        );
+
+      if (
+        distance <
+        nearestDistance &&
+        distance <=
+        maximumDistance
+      ) {
+
+        nearestDistance =
+          distance;
+
+        nearestIndex =
+          index;
+      }
+    }
+  );
+
+  return nearestIndex;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+function observeChartResize() {
+
+  const canvas =
+    CHART_STATE.canvas;
+
+  if (
+    !canvas ||
+    !canvas.parentElement
+  ) {
+    return;
+  }
+
+  if (
+    CHART_STATE.resizeObserver
+  ) {
+
+    CHART_STATE.resizeObserver
+      .disconnect();
+  }
+
+  if (
+    typeof ResizeObserver ===
+    "function"
+  ) {
+
+    CHART_STATE.resizeObserver =
+      new ResizeObserver(
+        () => {
+
+          clearTimeout(
+            CHART_STATE
+              .resizeTimer
+          );
+
+          CHART_STATE.resizeTimer =
+            setTimeout(
+              () => {
+
+                prepareCanvas();
+
+                drawDailyChart();
+              },
+              120
+            );
+        }
+      );
+
+    CHART_STATE.resizeObserver
+      .observe(
+        canvas.parentElement
+      );
+
+  } else {
+
+    window.onresize =
+      function() {
+
+        clearTimeout(
+          CHART_STATE
+            .resizeTimer
+        );
+
+        CHART_STATE.resizeTimer =
+          setTimeout(
+            () => {
+
+              prepareCanvas();
+
+              drawDailyChart();
+            },
+            120
+          );
+      };
+  }
+}
+
+
+/* =====================================================
+   SIN DATOS
+===================================================== */
+
+function drawEmptyChart(
+  context,
+  width,
+  height
+) {
+
+  context.save();
+
+  context.fillStyle =
+    CHART_COLORS.empty;
+
+  context.font =
+    "14px Inter, Segoe UI, Arial, sans-serif";
+
+  context.textAlign =
+    "center";
+
+  context.textBaseline =
+    "middle";
+
+  context.fillText(
+    "No hay datos para los filtros seleccionados",
+    width / 2,
+    height / 2
+  );
+
+  context.restore();
+
+  CHART_STATE.points = [];
+}
+
+
+/* =====================================================
+   LIMPIAR FALLBACK DE APP.JS
+===================================================== */
+
+function removeChartFallback() {
+
+  const canvas =
+    CHART_STATE.canvas;
+
+  if (
+    !canvas ||
+    !canvas.parentElement
+  ) {
+    return;
+  }
+
+  const fallback =
+    canvas.parentElement
+      .querySelector(
+        ".chart-fallback"
+      );
+
+  if (
+    fallback
+  ) {
+    fallback.remove();
+  }
+}
+
+
+/* =====================================================
+   FORMATO COMPACTO
+===================================================== */
+
+function compactNumber(
+  value
+) {
+
+  const number =
+    num(value);
+
+  if (
+    Math.abs(number) >=
+    1000000
+  ) {
+
+    return (
+      (
+        number /
+        1000000
+      ).toFixed(
+        number %
+        1000000 === 0
+          ? 0
+          : 1
+      ) +
+      " M"
+    );
+  }
+
+  if (
+    Math.abs(number) >=
+    1000
+  ) {
+
+    return (
+      (
+        number /
+        1000
+      ).toFixed(
+        number %
+        1000 === 0
+          ? 0
+          : 1
+      ) +
+      " mil"
+    );
+  }
+
+  return formatNumber(
+    number
+  );
+}
+
+
+/* =====================================================
+   UNIDAD DE LA MÉTRICA
+===================================================== */
+
+function getChartMetricUnit() {
+
+  if (
+    typeof getMetricUnit ===
+    "function"
+  ) {
+
+    return getMetricUnit();
+  }
+
+  if (
+    typeof CURRENT_DEPARTMENT !==
+    "undefined"
+  ) {
+
+    if (
+      CURRENT_DEPARTMENT ===
+      "Cuadros"
+    ) {
+
+      return "cuadros";
+    }
+
+    if (
+      CURRENT_DEPARTMENT ===
+      "Ejemplos"
+    ) {
+
+      return "prendas";
+    }
+
+    if (
+      CURRENT_DEPARTMENT ===
+      "Lavanderia"
+    ) {
+
+      return "pzas/kg";
+    }
+  }
+
+  return "piezas";
+}
+/* =====================================================
+   JV INTERNATIONAL
+   DASHBOARD DE PRODUCCIÓN V2
+   js/tables.js
+
+   Tabla avanzada sin librerías externas.
+
+   Requiere:
+   - utils.js
+   - filters.js
+
+   Funciones externas utilizadas:
+   - cleanText()
+   - escapeHtml()
+   - formatDate()
+   - formatNumber()
+   - parseDate()
+   - num()
+   - saveState()
+   - loadState()
+===================================================== */
+
+
+/* =====================================================
+   ESTADO DE LA TABLA
+===================================================== */
+
+const TABLE_STATE = {
+
+  department: "",
+
+  rows: [],
+
+  filteredRows: [],
+
+  columns: [],
+
+  search: "",
+
+  page: 1,
+
+  pageSize: 25,
+
+  sortColumn: "",
+
+  sortDirection: "asc"
+};
+
+
+/* =====================================================
+   CONFIGURACIÓN DE COLUMNAS POR DEPARTAMENTO
+===================================================== */
+
+const TABLE_COLUMNS = {
+
+  Estampado: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "NO. WO",
+      label: "No. WO",
+      type: "text"
+    },
+
+    {
+      key: "ESTILO",
+      label: "Estilo",
+      type: "text"
+    },
+
+    {
+      key: "CANT. COLORES",
+      label: "Cant. colores",
+      type: "number"
+    },
+
+    {
+      key: "TIPO DE PRENDA",
+      label: "Tipo de prenda",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE HIT",
+      label: "Tipo de hit",
+      type: "text"
+    },
+
+    {
+      key: "NO. MAQUINA",
+      label: "Máquina",
+      type: "text"
+    },
+
+    {
+      key: "TOTAL",
+      label: "Total",
+      type: "number"
+    },
+
+    {
+      key: "ESPECIALIDAD",
+      label: "Especialidad",
+      type: "text"
+    },
+
+    {
+      key: "TIEMPO MUERTO (MINS)",
+      label: "Tiempo muerto",
+      type: "number"
+    },
+
+    {
+      key: "MOTIVO",
+      label: "Motivo",
+      type: "text"
+    }
+  ],
+
+
+  Neck: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "NO. WO",
+      label: "No. WO",
+      type: "text"
+    },
+
+    {
+      key: "ESTILO",
+      label: "Estilo",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE PRENDA",
+      label: "Tipo de prenda",
+      type: "text"
+    },
+
+    {
+      key: "NO. MAQUINA",
+      label: "Máquina",
+      type: "text"
+    },
+
+    {
+      key: "TOTAL",
+      label: "Total",
+      type: "number"
+    },
+
+    {
+      key: "COMENTARIOS",
+      label: "Comentarios",
+      type: "text"
+    }
+  ],
+
+
+  Cuadros: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "NO. WO",
+      label: "No. WO",
+      type: "text"
+    },
+
+    {
+      key: "CANT. CUADROS",
+      label: "Cant. cuadros",
+      type: "number"
+    },
+
+    {
+      key: "PROCESO",
+      label: "Proceso",
+      type: "text"
+    },
+
+    {
+      key: "ESPECIALIDAD",
+      label: "Especialidad",
+      type: "text"
+    },
+
+    {
+      key: "DEPT",
+      label: "Departamento",
+      type: "text"
+    }
+  ],
+
+
+  Empaque: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "NO. WO",
+      label: "No. WO",
+      type: "text"
+    },
+
+    {
+      key: "ESTILO",
+      label: "Estilo",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE PRENDA",
+      label: "Tipo de prenda",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE EMPAQUE",
+      label: "Tipo de empaque",
+      type: "text"
+    },
+
+    {
+      key: "TOTAL",
+      label: "Total",
+      type: "number"
+    },
+
+    {
+      key: "TIEMPO MUERTO",
+      label: "Tiempo muerto",
+      type: "number"
+    },
+
+    {
+      key: "MOTIVO",
+      label: "Motivo",
+      type: "text"
+    }
+  ],
+
+
+  Ejemplos: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "CLIENTE",
+      label: "Cliente",
+      type: "text"
+    },
+
+    {
+      key: "NO. FOLDER",
+      label: "No. folder",
+      type: "text"
+    },
+
+    {
+      key: "ESTILO",
+      label: "Estilo",
+      type: "text"
+    },
+
+    {
+      key: "CUADROS",
+      label: "Cuadros",
+      type: "number"
+    },
+
+    {
+      key: "TIENDA",
+      label: "Tienda",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE HIT",
+      label: "Tipo de hit",
+      type: "text"
+    },
+
+    {
+      key: "PRENDAS",
+      label: "Prendas",
+      type: "number"
+    },
+
+    {
+      key: "DEPTO",
+      label: "Departamento",
+      type: "text"
+    },
+
+    {
+      key: "ESPECIALIDAD",
+      label: "Especialidad",
+      type: "text"
+    },
+
+    {
+      key: "NOTAS",
+      label: "Notas",
+      type: "text"
+    }
+  ],
+
+
+  Lavanderia: [
+
+    {
+      key: "FOLIO",
+      label: "Folio",
+      type: "number"
+    },
+
+    {
+      key: "FECHA",
+      label: "Fecha",
+      type: "date"
+    },
+
+    {
+      key: "NO. WO",
+      label: "No. WO",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE PRENDA",
+      label: "Tipo de prenda",
+      type: "text"
+    },
+
+    {
+      key: "TIPO DE PROCESO",
+      label: "Tipo de proceso",
+      type: "text"
+    },
+
+    {
+      key: "COLOR",
+      label: "Color",
+      type: "text"
+    },
+
+    {
+      key: "CANTIDAD DE PIEZAS",
+      label: "Cantidad de piezas",
+      type: "number"
+    },
+
+    {
+      key: "NO. MAQUINA",
+      label: "Máquina",
+      type: "text"
+    },
+
+    {
+      key: "TOTAL KGS",
+      label: "Total KGS",
+      type: "number"
+    },
+
+    {
+      key: "HORA DE COMIENZO",
+      label: "Hora de comienzo",
+      type: "text"
+    },
+
+    {
+      key: "HORA DE TERMINADO",
+      label: "Hora de terminado",
+      type: "text"
+    },
+
+    {
+      key: "TIEMPO MUERTO (MINS)",
+      label: "Tiempo muerto",
+      type: "number"
+    },
+
+    {
+      key: "MOTIVO",
+      label: "Motivo",
+      type: "text"
+    },
+
+    {
+      key: "COMENTARIOS",
+      label: "Comentarios",
+      type: "text"
+    }
+  ]
+};
+
+
+/* =====================================================
+   FUNCIÓN PRINCIPAL
+===================================================== */
+
+function renderDataTable(
+  department,
+  rows,
+  filterState
+) {
+
+  const container =
+    document.getElementById(
+      "tableContainer"
+    );
+
+  if (!container) {
+
+    console.warn(
+      "No se encontró #tableContainer."
+    );
+
+    return;
+  }
+
+  const departmentChanged =
+    TABLE_STATE.department !==
+    department;
+
+  const savedState =
+    loadTableState(
+      department
+    );
+
+  TABLE_STATE.department =
+    department;
+
+  TABLE_STATE.rows =
+    Array.isArray(rows)
+      ? rows.slice()
+      : [];
+
+  TABLE_STATE.columns =
+    getDepartmentColumns(
+      department,
+      TABLE_STATE.rows
+    );
+
+  if (departmentChanged) {
+
+    TABLE_STATE.search =
+      savedState.search || "";
+
+    TABLE_STATE.page =
+      1;
+
+    TABLE_STATE.pageSize =
+      savedState.pageSize || 25;
+
+    TABLE_STATE.sortColumn =
+      savedState.sortColumn || "";
+
+    TABLE_STATE.sortDirection =
+      savedState.sortDirection === "desc"
+        ? "desc"
+        : "asc";
+  }
+
+  if (
+    filterState &&
+    filterState.order &&
+    !TABLE_STATE.sortColumn
+  ) {
+
+    TABLE_STATE.sortDirection =
+      filterState.order;
+  }
+
+  applyTableSearchAndSort();
+
+  renderTableInterface();
+}
+
+
+/* =====================================================
+   COLUMNAS
+===================================================== */
+
+function getDepartmentColumns(
+  department,
+  rows
+) {
+
+  const configured =
+    TABLE_COLUMNS[
+      department
+    ];
+
+  if (
+    Array.isArray(configured) &&
+    configured.length
+  ) {
+
+    return configured.filter(
+      column =>
+        rows.some(
+          row =>
+            Object.prototype
+              .hasOwnProperty
+              .call(
+                row,
+                column.key
+              )
+        )
+    );
+  }
+
+  if (!rows.length) {
+    return [];
+  }
+
+  return Object.keys(
+    rows[0]
+  )
+
+    .filter(
+      key =>
+        !key.startsWith("__") &&
+        key !== "Visible" &&
+        key !== "Registro visible"
+    )
+
+    .map(
+      key => {
+
+        return {
+
+          key:
+            key,
+
+          label:
+            key,
+
+          type:
+            key === "FECHA"
+              ? "date"
+              : "text"
+        };
+      }
+    );
+}
+
+
+/* =====================================================
+   INTERFAZ COMPLETA
+===================================================== */
+
+function renderTableInterface() {
+
+  const container =
+    document.getElementById(
+      "tableContainer"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML =
+
+    renderTableToolbar() +
+
+    renderTableSummary() +
+
+    renderTableContent() +
+
+    renderTablePagination();
+
+  bindTableEvents();
+}
+
+
+/* =====================================================
+   BARRA DE CONTROLES
+===================================================== */
+
+function renderTableToolbar() {
+
+  return (
+
+    '<div class="table-toolbar">' +
+
+      '<div class="table-search-group">' +
+
+        '<label for="tableSearch">' +
+          "Buscar en registros" +
+        "</label>" +
+
+        '<input ' +
+          'type="search" ' +
+          'id="tableSearch" ' +
+          'placeholder="Folio, WO, estilo, categoría..." ' +
+          'value="' +
+          escapeTableAttribute(
+            TABLE_STATE.search
+          ) +
+        '">' +
+
+      "</div>" +
+
+      '<div class="table-page-size">' +
+
+        '<label for="tablePageSize">' +
+          "Filas por página" +
+        "</label>" +
+
+        '<select id="tablePageSize">' +
+
+          renderPageSizeOption(
+            10
+          ) +
+
+          renderPageSizeOption(
+            25
+          ) +
+
+          renderPageSizeOption(
+            50
+          ) +
+
+          renderPageSizeOption(
+            100
+          ) +
+
+        "</select>" +
+
+      "</div>" +
+
+      '<button ' +
+        'type="button" ' +
+        'class="table-export-button" ' +
+        'id="btnExportTable">' +
+        "Exportar CSV" +
+      "</button>" +
+
+    "</div>"
+  );
+}
+
+
+function renderPageSizeOption(
+  pageSize
+) {
+
+  const selected =
+    TABLE_STATE.pageSize ===
+    pageSize
+      ? " selected"
+      : "";
+
+  return (
+    '<option value="' +
+    pageSize +
+    '"' +
+    selected +
+    ">" +
+    pageSize +
+    "</option>"
+  );
+}
+
+
+/* =====================================================
+   RESUMEN DE RESULTADOS
+===================================================== */
+
+function renderTableSummary() {
+
+  const total =
+    TABLE_STATE.filteredRows.length;
+
+  const range =
+    getCurrentPageRange();
+
+  let message;
+
+  if (!total) {
+
+    message =
+      "No se encontraron registros.";
+
+  } else {
+
+    message =
+
+      "Mostrando " +
+
+      formatNumber(
+        range.start + 1
+      ) +
+
+      " a " +
+
+      formatNumber(
+        range.end
+      ) +
+
+      " de " +
+
+      formatNumber(
+        total
+      ) +
+
+      " registros.";
+  }
+
+  return (
+    '<div class="table-summary">' +
+      escapeHtml(message) +
+    "</div>"
+  );
+}
+
+
+/* =====================================================
+   CONTENIDO DE TABLA
+===================================================== */
+
+function renderTableContent() {
+
+  if (
+    !TABLE_STATE.filteredRows.length
+  ) {
+
+    return (
+
+      '<div class="table-empty">' +
+
+        "<strong>Sin resultados</strong>" +
+
+        "<span>" +
+          "Cambia los filtros o el texto de búsqueda." +
+        "</span>" +
+
+      "</div>"
+    );
+  }
+
+  if (
+    !TABLE_STATE.columns.length
+  ) {
+
+    return (
+
+      '<div class="table-empty">' +
+
+        "<strong>Sin columnas disponibles</strong>" +
+
+      "</div>"
+    );
+  }
+
+  const pageRows =
+    getCurrentPageRows();
+
+  return (
+
+    '<div class="table-wrapper">' +
+
+      '<table class="data-table">' +
+
+        "<thead>" +
+
+          "<tr>" +
+
+            TABLE_STATE.columns
+
+              .map(
+                renderTableHeader
+              )
+
+              .join("") +
+
+          "</tr>" +
+
+        "</thead>" +
+
+        "<tbody>" +
+
+          pageRows
+
+            .map(
+              renderTableRow
+            )
+
+            .join("") +
+
+        "</tbody>" +
+
+      "</table>" +
+
+    "</div>"
+  );
+}
+
+
+/* =====================================================
+   ENCABEZADOS ORDENABLES
+===================================================== */
+
+function renderTableHeader(
+  column
+) {
+
+  const active =
+    TABLE_STATE.sortColumn ===
+    column.key;
+
+  let icon =
+    "↕";
+
+  if (active) {
+
+    icon =
+      TABLE_STATE.sortDirection ===
+      "asc"
+        ? "↑"
+        : "↓";
+  }
+
+  return (
+
+    '<th ' +
+      'scope="col" ' +
+      'class="sortable-column' +
+      (
+        active
+          ? " active-sort"
+          : ""
+      ) +
+      '" ' +
+      'data-column="' +
+      escapeTableAttribute(
+        column.key
+      ) +
+    '">' +
+
+      '<button type="button">' +
+
+        '<span>' +
+          escapeHtml(
+            column.label
+          ) +
+        "</span>" +
+
+        '<span class="sort-icon">' +
+          icon +
+        "</span>" +
+
+      "</button>" +
+
+    "</th>"
+  );
+}
+
+
+/* =====================================================
+   FILAS Y CELDAS
+===================================================== */
+
+function renderTableRow(
+  row,
+  rowIndex
+) {
+
+  const absoluteIndex =
+    (
+      TABLE_STATE.page - 1
+    ) *
+    TABLE_STATE.pageSize +
+    rowIndex;
+
+  return (
+
+    '<tr data-row-index="' +
+      absoluteIndex +
+    '">' +
+
+      TABLE_STATE.columns
+
+        .map(
+          column =>
+            renderTableCell(
+              row,
+              column
+            )
+        )
+
+        .join("") +
+
+    "</tr>"
+  );
+}
+
+
+function renderTableCell(
+  row,
+  column
+) {
+
+  const rawValue =
+    row[column.key];
+
+  const displayValue =
+    formatTableValue(
+      rawValue,
+      column
+    );
+
+  const numericClass =
+    column.type === "number"
+      ? " numeric-cell"
+      : "";
+
+  return (
+
+    '<td class="' +
+      numericClass.trim() +
+      '" title="' +
+      escapeTableAttribute(
+        displayValue
+      ) +
+    '">' +
+
+      escapeHtml(
+        displayValue
+      ) +
+
+    "</td>"
+  );
+}
+
+
+function formatTableValue(
+  value,
+  column
+) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+
+    return "";
+  }
+
+  if (
+    column.type === "date"
+  ) {
+
+    return (
+      formatDate(value) ||
+      cleanText(value)
+    );
+  }
+
+  if (
+    column.type === "number"
+  ) {
+
+    return formatNumber(
+      value
+    );
+  }
+
+  return cleanText(
+    value
+  );
+}
+
+
+/* =====================================================
+   PAGINACIÓN
+===================================================== */
+
+function renderTablePagination() {
+
+  const totalPages =
+    getTotalPages();
+
+  if (
+    totalPages <= 1
+  ) {
+
+    return "";
+  }
+
+  return (
+
+    '<nav class="table-pagination" ' +
+      'aria-label="Paginación de registros">' +
+
+      '<button ' +
+        'type="button" ' +
+        'data-page-action="first" ' +
+        (
+          TABLE_STATE.page <= 1
+            ? "disabled"
+            : ""
+        ) +
+      ">" +
+        "Primera" +
+      "</button>" +
+
+      '<button ' +
+        'type="button" ' +
+        'data-page-action="previous" ' +
+        (
+          TABLE_STATE.page <= 1
+            ? "disabled"
+            : ""
+        ) +
+      ">" +
+        "Anterior" +
+      "</button>" +
+
+      '<span class="pagination-status">' +
+
+        "Página " +
+
+        formatNumber(
+          TABLE_STATE.page
+        ) +
+
+        " de " +
+
+        formatNumber(
+          totalPages
+        ) +
+
+      "</span>" +
+
+      '<button ' +
+        'type="button" ' +
+        'data-page-action="next" ' +
+        (
+          TABLE_STATE.page >=
+          totalPages
+            ? "disabled"
+            : ""
+        ) +
+      ">" +
+        "Siguiente" +
+      "</button>" +
+
+      '<button ' +
+        'type="button" ' +
+        'data-page-action="last" ' +
+        (
+          TABLE_STATE.page >=
+          totalPages
+            ? "disabled"
+            : ""
+        ) +
+      ">" +
+        "Última" +
+      "</button>" +
+
+    "</nav>"
+  );
+}
+
+
+function getTotalPages() {
+
+  return Math.max(
+
+    1,
+
+    Math.ceil(
+
+      TABLE_STATE.filteredRows.length /
+
+      TABLE_STATE.pageSize
+    )
+  );
+}
+
+
+function getCurrentPageRange() {
+
+  const total =
+    TABLE_STATE.filteredRows.length;
+
+  if (!total) {
+
+    return {
+
+      start: 0,
+
+      end: 0
+    };
+  }
+
+  const start =
+    (
+      TABLE_STATE.page - 1
+    ) *
+    TABLE_STATE.pageSize;
+
+  const end =
+    Math.min(
+      start +
+      TABLE_STATE.pageSize,
+      total
+    );
+
+  return {
+
+    start:
+      start,
+
+    end:
+      end
+  };
+}
+
+
+function getCurrentPageRows() {
+
+  const range =
+    getCurrentPageRange();
+
+  return TABLE_STATE.filteredRows.slice(
+    range.start,
+    range.end
+  );
+}
+
+
+/* =====================================================
+   BÚSQUEDA Y ORDENAMIENTO
+===================================================== */
+
+function applyTableSearchAndSort() {
+
+  let result =
+    TABLE_STATE.rows.slice();
+
+  const search =
+    normalizeSearchText(
+      TABLE_STATE.search
+    );
+
+  if (search) {
+
+    result =
+      result.filter(
+        row =>
+          rowMatchesSearch(
+            row,
+            search
+          )
+      );
+  }
+
+  if (
+    TABLE_STATE.sortColumn
+  ) {
+
+    const column =
+      TABLE_STATE.columns.find(
+        item =>
+          item.key ===
+          TABLE_STATE.sortColumn
+      );
+
+    if (column) {
+
+      result.sort(
+        (a,b) =>
+          compareTableValues(
+            a[column.key],
+            b[column.key],
+            column.type,
+            TABLE_STATE.sortDirection
+          )
+      );
+    }
+  }
+
+  TABLE_STATE.filteredRows =
+    result;
+
+  const totalPages =
+    getTotalPages();
+
+  if (
+    TABLE_STATE.page >
+    totalPages
+  ) {
+
+    TABLE_STATE.page =
+      totalPages;
+  }
+
+  if (
+    TABLE_STATE.page < 1
+  ) {
+
+    TABLE_STATE.page = 1;
+  }
+
+  saveCurrentTableState();
+}
+
+
+function rowMatchesSearch(
+  row,
+  normalizedSearch
+) {
+
+  return TABLE_STATE.columns.some(
+    column => {
+
+      let value =
+        row[column.key];
+
+      if (
+        column.type === "date"
+      ) {
+
+        value =
+          formatDate(value) +
+          " " +
+          cleanText(value);
+      }
+
+      return normalizeSearchText(
+        value
+      ).includes(
+        normalizedSearch
+      );
+    }
+  );
+}
+
+
+function normalizeSearchText(
+  value
+) {
+
+  return cleanText(value)
+
+    .toLocaleLowerCase(
+      "es-MX"
+    )
+
+    .normalize(
+      "NFD"
+    )
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+}
+
+
+function compareTableValues(
+  first,
+  second,
+  type,
+  direction
+) {
+
+  let comparison = 0;
+
+  if (
+    type === "number"
+  ) {
+
+    comparison =
+      num(first) -
+      num(second);
+
+  } else if (
+    type === "date"
+  ) {
+
+    const firstDate =
+      parseDate(first);
+
+    const secondDate =
+      parseDate(second);
+
+    const firstTime =
+      firstDate &&
+      !isNaN(firstDate)
+        ? firstDate.getTime()
+        : 0;
+
+    const secondTime =
+      secondDate &&
+      !isNaN(secondDate)
+        ? secondDate.getTime()
+        : 0;
+
+    comparison =
+      firstTime -
+      secondTime;
+
+  } else {
+
+    comparison =
+      cleanText(first)
+        .localeCompare(
+          cleanText(second),
+          "es",
+          {
+            numeric: true,
+            sensitivity: "base"
+          }
+        );
+  }
+
+  return direction === "desc"
+    ? comparison * -1
+    : comparison;
+}
+
+
+/* =====================================================
+   EVENTOS
+===================================================== */
+
+function bindTableEvents() {
+
+  const searchInput =
+    document.getElementById(
+      "tableSearch"
+    );
+
+  if (searchInput) {
+
+    let searchTimer;
+
+    searchInput.oninput =
+      function() {
+
+        clearTimeout(
+          searchTimer
+        );
+
+        searchTimer =
+          setTimeout(
+            () => {
+
+              TABLE_STATE.search =
+                searchInput.value;
+
+              TABLE_STATE.page = 1;
+
+              applyTableSearchAndSort();
+
+              renderTableInterface();
+
+              restoreTableSearchFocus();
+
+            },
+            180
+          );
+      };
+  }
+
+  const pageSizeSelect =
+    document.getElementById(
+      "tablePageSize"
+    );
+
+  if (pageSizeSelect) {
+
+    pageSizeSelect.onchange =
+      function() {
+
+        TABLE_STATE.pageSize =
+          Number(
+            pageSizeSelect.value
+          ) || 25;
+
+        TABLE_STATE.page = 1;
+
+        applyTableSearchAndSort();
+
+        renderTableInterface();
+      };
+  }
+
+  const exportButton =
+    document.getElementById(
+      "btnExportTable"
+    );
+
+  if (exportButton) {
+
+    exportButton.onclick =
+      exportCurrentTableToCSV;
+  }
+
+  document
+    .querySelectorAll(
+      ".sortable-column"
+    )
+    .forEach(
+      header => {
+
+        header.onclick =
+          function() {
+
+            const column =
+              header.dataset.column;
+
+            handleColumnSort(
+              column
+            );
+          };
+      }
+    );
+
+  document
+    .querySelectorAll(
+      "[data-page-action]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          function() {
+
+            handlePageAction(
+              button.dataset
+                .pageAction
+            );
+          };
+      }
+    );
+}
+
+
+function handleColumnSort(
+  column
+) {
+
+  if (
+    TABLE_STATE.sortColumn ===
+    column
+  ) {
+
+    TABLE_STATE.sortDirection =
+      TABLE_STATE.sortDirection ===
+      "asc"
+        ? "desc"
+        : "asc";
+
+  } else {
+
+    TABLE_STATE.sortColumn =
+      column;
+
+    TABLE_STATE.sortDirection =
+      column === "FECHA"
+        ? "asc"
+        : "asc";
+  }
+
+  TABLE_STATE.page = 1;
+
+  applyTableSearchAndSort();
+
+  renderTableInterface();
+}
+
+
+function handlePageAction(
+  action
+) {
+
+  const totalPages =
+    getTotalPages();
+
+  if (
+    action === "first"
+  ) {
+
+    TABLE_STATE.page = 1;
+  }
+
+  if (
+    action === "previous"
+  ) {
+
+    TABLE_STATE.page =
+      Math.max(
+        1,
+        TABLE_STATE.page - 1
+      );
+  }
+
+  if (
+    action === "next"
+  ) {
+
+    TABLE_STATE.page =
+      Math.min(
+        totalPages,
+        TABLE_STATE.page + 1
+      );
+  }
+
+  if (
+    action === "last"
+  ) {
+
+    TABLE_STATE.page =
+      totalPages;
+  }
+
+  saveCurrentTableState();
+
+  renderTableInterface();
+
+  scrollTableIntoView();
+}
+
+
+/* =====================================================
+   CONSERVAR FOCO DE BÚSQUEDA
+===================================================== */
+
+function restoreTableSearchFocus() {
+
+  const searchInput =
+    document.getElementById(
+      "tableSearch"
+    );
+
+  if (!searchInput) {
+    return;
+  }
+
+  searchInput.focus();
+
+  const length =
+    searchInput.value.length;
+
+  searchInput.setSelectionRange(
+    length,
+    length
+  );
+}
+
+
+/* =====================================================
+   DESPLAZAMIENTO A LA TABLA
+===================================================== */
+
+function scrollTableIntoView() {
+
+  const container =
+    document.getElementById(
+      "tableContainer"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  const rectangle =
+    container.getBoundingClientRect();
+
+  if (
+    rectangle.top < 0
+  ) {
+
+    container.scrollIntoView(
+      {
+        behavior: "smooth",
+        block: "start"
+      }
+    );
+  }
+}
+
+
+/* =====================================================
+   EXPORTAR CSV
+===================================================== */
+
+function exportCurrentTableToCSV() {
+
+  const rows =
+    TABLE_STATE.filteredRows;
+
+  const columns =
+    TABLE_STATE.columns;
+
+  if (
+    !rows.length ||
+    !columns.length
+  ) {
+
+    window.alert(
+      "No hay registros para exportar."
+    );
+
+    return;
+  }
+
+  const csvRows = [];
+
+  csvRows.push(
+
+    columns
+
+      .map(
+        column =>
+          csvEscape(
+            column.label
+          )
+      )
+
+      .join(",")
+  );
+
+  rows.forEach(
+    row => {
+
+      csvRows.push(
+
+        columns
+
+          .map(
+            column => {
+
+              let value =
+                row[column.key];
+
+              if (
+                column.type ===
+                "date"
+              ) {
+
+                value =
+                  formatDate(value);
+              }
+
+              return csvEscape(
+                value
+              );
+            }
+          )
+
+          .join(",")
+      );
+    }
+  );
+
+  const csvText =
+    "\uFEFF" +
+    csvRows.join(
+      "\r\n"
+    );
+
+  const blob =
+    new Blob(
+      [csvText],
+      {
+        type:
+          "text/csv;charset=utf-8"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+  const dateText =
+    new Date()
+      .toISOString()
+      .substring(
+        0,
+        10
+      );
+
+  link.href =
+    url;
+
+  link.download =
+    sanitizeFileName(
+      TABLE_STATE.department
+    ) +
+    "_" +
+    dateText +
+    ".csv";
+
+  document.body.appendChild(
+    link
+  );
+
+  link.click();
+
+  link.remove();
+
+  URL.revokeObjectURL(
+    url
+  );
+}
+
+
+function csvEscape(
+  value
+) {
+
+  const text =
+    value === null ||
+    value === undefined
+      ? ""
+      : String(value);
+
+  return (
+    '"' +
+    text.replace(
+      /"/g,
+      '""'
+    ) +
+    '"'
+  );
+}
+
+
+function sanitizeFileName(
+  value
+) {
+
+  return cleanText(value)
+
+    .normalize(
+      "NFD"
+    )
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+
+    .replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    );
+}
+
+
+/* =====================================================
+   ESTADO PERSISTENTE
+===================================================== */
+
+function getTableStorageKey(
+  department
+) {
+
+  return (
+    "table_" +
+    cleanText(
+      department
+    )
+  );
+}
+
+
+function loadTableState(
+  department
+) {
+
+  return loadState(
+    getTableStorageKey(
+      department
+    ),
+    {
+      search: "",
+      pageSize: 25,
+      sortColumn: "",
+      sortDirection: "asc"
+    }
+  );
+}
+
+
+function saveCurrentTableState() {
+
+  if (
+    !TABLE_STATE.department
+  ) {
+    return;
+  }
+
+  saveState(
+    getTableStorageKey(
+      TABLE_STATE.department
+    ),
+    {
+      search:
+        TABLE_STATE.search,
+
+      pageSize:
+        TABLE_STATE.pageSize,
+
+      sortColumn:
+        TABLE_STATE.sortColumn,
+
+      sortDirection:
+        TABLE_STATE.sortDirection
+    }
+  );
+}
+
+
+/* =====================================================
+   ESCAPAR ATRIBUTOS
+===================================================== */
+
+function escapeTableAttribute(
+  value
+) {
+
+  return String(
+    value === null ||
+    value === undefined
+      ? ""
+      : value
+  )
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#39;"
+    );
+}
+/* ---------------- */
+/* TABLA V2         */
+/* ---------------- */
+
+.table-toolbar{
+
+  display:flex;
+
+  align-items:end;
+
+  gap:12px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:14px;
+}
+
+.table-search-group{
+
+  flex:1;
+
+  min-width:240px;
+}
+
+.table-page-size{
+
+  width:140px;
+}
+
+.table-toolbar label{
+
+  display:block;
+
+  margin-bottom:5px;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+  font-weight:700;
+
+  text-transform:uppercase;
+}
+
+.table-toolbar input,
+.table-toolbar select{
+
+  width:100%;
+
+  height:40px;
+
+  border:1px solid var(--border);
+
+  border-radius:8px;
+
+  padding:0 10px;
+
+  background:#fff;
+
+  color:var(--text);
+}
+
+.table-export-button{
+
+  height:40px;
+
+  padding:0 16px;
+
+  border:0;
+
+  border-radius:8px;
+
+  background:var(--primary);
+
+  color:white;
+
+  cursor:pointer;
+
+  font-weight:700;
+}
+
+.table-export-button:hover{
+
+  background:var(--primary-2);
+}
+
+.table-summary{
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  margin-bottom:10px;
+}
+
+.table-empty{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+
+  padding:35px;
+
+  text-align:center;
+
+  color:var(--muted);
+}
+
+.data-table th button{
+
+  width:100%;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:8px;
+
+  border:0;
+
+  padding:0;
+
+  background:transparent;
+
+  color:#4b5868;
+
+  cursor:pointer;
+
+  font:inherit;
+
+  font-weight:700;
+
+  text-align:left;
+}
+
+.sort-icon{
+
+  color:#8a96a5;
+
+  font-size:13px;
+}
+
+.active-sort .sort-icon{
+
+  color:var(--primary);
+}
+
+.numeric-cell{
+
+  text-align:right;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.table-pagination{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+
+  margin-top:15px;
+}
+
+.table-pagination button{
+
+  min-height:36px;
+
+  padding:0 12px;
+
+  border:1px solid var(--border);
+
+  border-radius:8px;
+
+  background:white;
+
+  color:var(--text);
+
+  cursor:pointer;
+}
+
+.table-pagination button:hover:not(:disabled){
+
+  color:white;
+
+  border-color:var(--primary);
+
+  background:var(--primary);
+}
+
+.table-pagination button:disabled{
+
+  opacity:.45;
+
+  cursor:not-allowed;
+}
+
+.pagination-status{
+
+  padding:0 8px;
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  font-weight:700;
+}
+
+.distribution-item{
+
+  margin-bottom:13px;
+}
+
+.distribution-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  margin-bottom:6px;
+
+  font-size:12px;
+}
+
+@media(max-width:600px){
+
+  .table-toolbar{
+
+    display:grid;
+
+    grid-template-columns:1fr;
+  }
+
+  .table-page-size{
+
+    width:100%;
+  }
+
+  .table-export-button{
+
+    width:100%;
+  }
+}
