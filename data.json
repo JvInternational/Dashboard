@@ -24768,7 +24768,7 @@
     },
     {
       "FOLIO": 32,
-      "FECHA": "1899-12-31T10:56:30.000Z",
+      "FECHA": "2026-08-27T07:00:00.000Z",
       "NO. WO": "BA294438",
       "TIPO DE PRENDA": "TELA EN LIENZO",
       "TIPO DE PROCESO": "SECADO",
@@ -27926,9 +27926,9 @@
       "TIPO DE PROCESO": "TEÑIDO DIRECTOS",
       "COLOR": "ROSA",
       "CANTIDAD DE PIEZAS": "",
-      "NO. MAQUINA": "",
-      "TOTAL KGS": "",
-      "HORA DE COMIENZO": "",
+      "NO. MAQUINA": 1,
+      "TOTAL KGS": 46,
+      "HORA DE COMIENZO": "1899-12-30T15:18:04.000Z",
       "HORA DE TERMINADO": "",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
@@ -27936,11 +27936,11 @@
     },
     {
       "FOLIO": 230,
-      "FECHA": "",
+      "FECHA": "2026-09-22T07:00:00.000Z",
       "NO. WO": "",
-      "TIPO DE PRENDA": "",
-      "TIPO DE PROCESO": "",
-      "COLOR": "",
+      "TIPO DE PRENDA": "TELA EN LIENZO",
+      "TIPO DE PROCESO": "TEÑIDO DIRECTOS",
+      "COLOR": "ROSA",
       "CANTIDAD DE PIEZAS": "",
       "NO. MAQUINA": "",
       "TOTAL KGS": "",
@@ -33279,6 +33279,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-09-22T15:38:39.493Z",
+  "generatedAt": "2026-09-22T16:09:14.641Z",
   "source": "Google Sheets"
 }
