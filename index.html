@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JV International — Dashboard de Producción 2.0</title>
+<title>JV International — Dashboard de Producción 3.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --ink:#171b21; --muted:#6b7280; --line:#e5e7eb;
@@ -81,23 +83,16 @@ h1,h2,h3{font-family:'Space Grotesk',Inter,sans-serif;font-weight:600;margin:0}
 @media(max-width:700px){.app{display:block}.side{position:static;width:100%;height:auto}.nav{flex-direction:row;overflow-x:auto}.nav button{white-space:nowrap;width:auto}.main{padding:16px}.kpis,.deptgrid{grid-template-columns:1fr}.top{display:block}.updated{display:inline-block;margin-top:10px}}
 ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#d7dbe1;border-radius:4px}
 
-/* Versión 2.0: navegación móvil y controles responsivos */
-.menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:1200;border:0;border-radius:10px;background:#12161d;color:#fff;width:42px;height:42px;font-size:22px;box-shadow:var(--shadow);cursor:pointer}
-.menu-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.46);z-index:1090}
-@media(max-width:768px){
-  .menu-toggle{display:block}.app{display:block}.side{position:fixed;left:-260px;top:0;width:236px;height:100vh;z-index:1100;transition:left .25s ease;box-shadow:8px 0 28px rgba(0,0,0,.2)}
-  .side.open{left:0}.menu-overlay.open{display:block}.main{padding:68px 12px 20px!important;width:100%}
-  .cards,.kpis,.grid,.grid-2,.charts{grid-template-columns:1fr!important}.filters{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
-  .field,.field select,.field input,.btn{width:100%!important}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:720px}
-  h1{font-size:24px!important}.card{border-radius:12px!important}canvas{max-width:100%!important}
-}
-@media(min-width:769px){.side{left:auto!important}}
+/* v3.0 */
+body.dark{--bg:#0f141b;--card:#18202b;--ink:#edf2f7;--muted:#a8b2c1;--line:#2a3442;--shadow:0 8px 28px rgba(0,0,0,.22)}
+body.dark .field input,body.dark .field select{background:#111923;color:var(--ink);border-color:var(--line)}body.dark .secondary{background:#263141;color:#e5e7eb}body.dark .updated{background:var(--card)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.iconbtn{height:36px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);padding:0 12px;cursor:pointer;font-weight:600}.searchbar{min-width:250px;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 12px;background:var(--card);color:var(--ink)}
+.dept{cursor:pointer;transition:.2s}.dept:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,.12)}.executive{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.exec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.exec b{display:block;font:600 20px 'IBM Plex Mono';margin-top:6px}.widegrid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:16px}.search-results{position:fixed;right:28px;top:72px;width:min(620px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:var(--card);border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.22);border-radius:12px;z-index:1300;padding:10px;display:none}.sr{padding:10px;border-bottom:1px solid var(--line);cursor:pointer}.sr:hover{background:var(--bg)}
+@media(max-width:768px){.main{padding:16px 10px 40px}.top{flex-direction:column}.tools{width:100%;justify-content:stretch}.searchbar{min-width:0;flex:1}.deptgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.widegrid,.grid,.executive{grid-template-columns:1fr!important}.executive{grid-template-columns:repeat(2,1fr)!important}.title{font-size:22px}.chartbox{height:280px!important}.search-results{right:12px;top:120px}}
 </style></head>
 <body>
-<button class="menu-toggle" id="menuToggle" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
-<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="app">
-  <aside class="side" id="sidebar">
+  <aside class="side">
     <div class="brand">JV INTERNATIONAL</div>
     <div class="sub">Dashboard de producción</div>
     <div class="nav" id="nav"></div>
@@ -126,11 +121,7 @@ function dkey(v){return v?String(v).slice(0,10):''}
 function fmtDate(v){let k=dkey(v);if(!k)return '—';let p=k.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:k}
 function isNum(v){return typeof v==='number'}
 function rows(dept){return DATA[dept]||[]}
-function visible(dept,r){
-  const campo=dept==='Lavanderia'?'Registro visible':'Visible';
-  if(!(campo in r)||r[campo]===null||String(r[campo]).trim()==='')return true;
-  return ['1','true','si','sí'].includes(String(r[campo]).trim().toLowerCase());
-}
+function visible(dept,r){const campo=dept==='Lavanderia'?'Registro visible':'Visible';if(!(campo in r)||r[campo]==null||String(r[campo]).trim()==='')return true;return ['1','true','si','sí'].includes(String(r[campo]).trim().toLowerCase())}
 function dates(rs){return rs.map(r=>dkey(r.FECHA)).filter(Boolean).sort()}
 function options(rs,key){return [...new Set(rs.map(r=>r[key]).filter(v=>v!==null&&v!==''))].sort((a,b)=>String(a).localeCompare(String(b),'es'))}
 function sum(rs,key){return rs.reduce((a,r)=>a+num(r[key]),0)}
@@ -160,8 +151,7 @@ function filters(dept){
     <div class="field"><label>Filtrar por</label><select id="fDim" onchange="updateValues('${dept}')"><option value="">Todos</option>${opts}</select></div>
     <div class="field"><label>Valor</label><select id="fVal" onchange="renderDept('${dept}')"><option value="">Todos</option></select></div>
     <button class="btn secondary" onclick="resetFilters('${dept}')">Restablecer</button>
-    <button class="btn secondary" onclick="downloadCSV('${dept}')">Exportar CSV</button>
-    <button class="btn primary" onclick="downloadExcel('${dept}')">Exportar Excel</button>
+    <button class="btn primary" onclick="downloadCSV('${dept}')">Exportar CSV</button>
   </div>`;
 }
 function updateValues(dept){let rs=baseVis(dept),dim=document.getElementById('fDim').value,sel=document.getElementById('fVal');sel.innerHTML='<option value="">Todos</option>'+options(rs,dim).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderDept(dept)}
@@ -265,72 +255,32 @@ function updateValuesNoRender(dept){let dim=document.getElementById('fDim')?.val
 function show(dept){current=dept;if(dept==='General')renderGeneral();else renderDept(dept)}
 
 /* ---------- vista general ---------- */
+function downValue(r){return num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO'])}
 function renderGeneral(){
-  nav();
-  let cards=depts.map(d=>{let c=cfg[d],rs=baseVis(d),v=sum(rs,c.value);
-    return `<div class="card dept" style="--accent:${c.accent}" onclick="show('${d}')"><span class="pill">${d==='Lavanderia'?'LAVANDERÍA':d.toUpperCase()}</span><div class="num">${fmt(v)}</div><div class="desc">${esc(c.metric)}</div><div class="note">${fmt(rs.length)} registros visibles</div></div>`;
-  }).join('');
-
-  const piezaAreas=['Estampado','Neck','Empaque'];
-  const downAreas=depts.filter(d=>cfg[d].hasDowntime);
-
-  document.getElementById('view').innerHTML=`
-    <div class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta web de la bitácora. Selecciona un área en el menú para ver su detalle.</div></div><div class="updated">Último registro: ${esc(lastDate())}</div></div>
-    <div class="card" style="margin-bottom:16px"><h3>Áreas de producción</h3><div class="deptgrid">${cards}</div></div>
-    <div class="grid">
-      <div class="card"><h3>Piezas por día — Estampado, Neck y Empaque</h3><div class="chartbox"><canvas id="chGenTrend"></canvas></div></div>
-      <div class="card"><h3>Tiempo muerto total por área (min)</h3><div class="chartbox"><canvas id="chGenDown"></canvas></div></div>
-    </div>
-    <div class="card"><h3>Comentarios</h3><div class="comment-box">${esc(comentarios('General'))||'Sin comentarios todavía. Escríbelo en la celda de comentarios general de tu Google Sheet — aparecerá aquí para todos en la próxima sincronización.'}</div></div>
-    <div class="footer">Fuente: Bitacora de Produccion.xlsx (OneDrive) · Aplicación de consulta</div>`;
-
-  // trend combinado
-  let allDays=new Set(); piezaAreas.forEach(d=>baseVis(d).forEach(r=>{let k=dkey(r.FECHA);if(k)allDays.add(k)}));
-  let days=[...allDays].sort();
-  destroyChart('chGenTrend');
-  const elT=document.getElementById('chGenTrend');
-  if(days.length){
-    CHARTS['chGenTrend']=new Chart(elT.getContext('2d'),{type:'line',
-      data:{labels:days.map(fmtDate),datasets:piezaAreas.map(d=>{let m={};baseVis(d).forEach(r=>{let k=dkey(r.FECHA);if(k)m[k]=(m[k]||0)+num(r[cfg[d].value])});return {label:d,data:days.map(k=>m[k]||0),borderColor:cfg[d].accent,backgroundColor:cfg[d].accent+'20',tension:.3,fill:false,pointRadius:1.5,borderWidth:2}})},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#4b5563',boxWidth:10,font:{size:11.5,family:'Inter'}}}},
-        scales:{x:{ticks:{color:'#8b93a1',font:{size:10,family:'Inter'},maxTicksLimit:10},grid:{display:false}},y:{ticks:{color:'#8b93a1',font:{size:10.5,family:'Inter'}},grid:{color:'#eef0f3'},beginAtZero:true}}}
-    });
-  } else { elT.parentElement.innerHTML='<div class="empty">Sin datos</div>'; }
-
-  // downtime total por área
-  destroyChart('chGenDown');
-  const elD=document.getElementById('chGenDown');
-  let downVals=downAreas.map(d=>sum(baseVis(d),'TIEMPO MUERTO (MINS)')+sum(baseVis(d),'TIEMPO MUERTO'));
-  CHARTS['chGenDown']=new Chart(elD.getContext('2d'),{type:'bar',
-    data:{labels:downAreas.map(d=>d==='Lavanderia'?'Lavandería':d),datasets:[{data:downVals,backgroundColor:downAreas.map(d=>cfg[d].accent),borderRadius:6,maxBarThickness:56}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+' min'}}},
-      scales:{x:{ticks:{color:'#4b5563',font:{size:12,family:'Inter'}},grid:{display:false}},y:{ticks:{color:'#8b93a1',font:{size:10.5,family:'Inter'}},grid:{color:'#eef0f3'},beginAtZero:true}}}
-  });
+ nav(); const stats=depts.map(d=>({d,c:cfg[d],rs:baseVis(d),total:sum(baseVis(d),cfg[d].value),down:baseVis(d).reduce((a,r)=>a+downValue(r),0)}));
+ const cards=stats.map(x=>`<div class="card dept" style="--accent:${x.c.accent}" onclick="show('${x.d}')"><span class="pill">${x.d==='Lavanderia'?'LAVANDERÍA':x.d.toUpperCase()}</span><div class="num">${fmt(x.total)}</div><div class="desc">${esc(x.c.metric)}</div><div class="note">${fmt(x.rs.length)} registros visibles</div></div>`).join('');
+ const totalDown=stats.reduce((a,x)=>a+x.down,0), maxProd=[...stats].sort((a,b)=>b.total-a.total)[0], maxDown=[...stats].sort((a,b)=>b.down-a.down)[0];
+ document.getElementById('view').innerHTML=`<div class="top"><div><h1 class="title">Dashboard de Producción 3.0</h1><div class="desc">Vista ejecutiva de todas las áreas · actualización automática cada 60 segundos</div></div><div class="tools"><input id="globalSearch" class="searchbar" placeholder="🔍 Buscar OT, máquina, cliente…" oninput="globalSearch(this.value)"><button class="iconbtn" onclick="toggleTheme()">☀️/🌙</button><button class="iconbtn" onclick="exportPDF()">📄 PDF</button><div class="updated">Último registro: ${esc(lastDate())}</div></div></div>
+ <div class="card"><h3>Áreas de producción</h3><div class="deptgrid">${cards}</div></div>
+ <div class="executive"><div class="exec">Producción líder<b>${esc(maxProd.d)}</b><small>${fmt(maxProd.total)}</small></div><div class="exec">Tiempo muerto total<b>${fmt(totalDown)} min</b><small>Áreas con registro</small></div><div class="exec">Mayor tiempo muerto<b>${esc(maxDown.d)}</b><small>${fmt(maxDown.down)} min</small></div><div class="exec">Áreas activas<b>${stats.filter(x=>x.rs.length).length}</b><small>Último registro ${esc(lastDate())}</small></div></div>
+ <div class="widegrid"><div class="card"><h3>Producción total por área</h3><div class="chartbox"><canvas id="chProd"></canvas></div></div><div class="card"><h3>Tiempo muerto por área (min)</h3><div class="chartbox"><canvas id="chDown"></canvas></div></div></div>
+ <div class="widegrid"><div class="card"><h3>Top 5 motivos de tiempo muerto</h3><div class="chartbox"><canvas id="chReasons"></canvas></div></div><div class="card"><h3>Resumen ejecutivo</h3><div class="comment-box">Mayor producción: <b>${esc(maxProd.d)}</b> (${fmt(maxProd.total)}).<br><br>Mayor tiempo muerto: <b>${esc(maxDown.d)}</b> (${fmt(maxDown.down)} min).<br><br>Registros visibles: <b>${fmt(stats.reduce((a,x)=>a+x.rs.length,0))}</b>.<br><br>Última actualización: <b>${esc(lastDate())}</b>.</div></div></div><div class="footer">Dashboard de Producción 3.0 · actualización automática activa</div>`;
+ const labels=stats.map(x=>x.d==='Lavanderia'?'Lavandería':x.d), colors=stats.map(x=>x.c.accent); ['chProd','chDown','chReasons'].forEach(destroyChart);
+ CHARTS.chProd=new Chart(document.getElementById('chProd'),{type:'bar',data:{labels,datasets:[{data:stats.map(x=>x.total),backgroundColor:colors,borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true},y:{grid:{display:false}}}}});
+ CHARTS.chDown=new Chart(document.getElementById('chDown'),{type:'bar',data:{labels,datasets:[{data:stats.map(x=>x.down),backgroundColor:colors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+ const reasons={}; stats.forEach(x=>x.rs.forEach(r=>{let v=downValue(r),m=String(r.MOTIVO||'Sin motivo').trim();if(v>0)reasons[m]=(reasons[m]||0)+v})); const top=Object.entries(reasons).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ CHARTS.chReasons=new Chart(document.getElementById('chReasons'),{type:'bar',data:{labels:top.map(x=>x[0]),datasets:[{data:top.map(x=>x[1]),backgroundColor:'#c9762f',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true},y:{grid:{display:false}}}}});
 }
-
-/* ---------- versión 2.0: menú móvil y Excel ---------- */
-function toggleMenu(){document.getElementById('sidebar')?.classList.toggle('open');document.getElementById('menuOverlay')?.classList.toggle('open')}
-function closeMenu(){document.getElementById('sidebar')?.classList.remove('open');document.getElementById('menuOverlay')?.classList.remove('open')}
-window.addEventListener('resize',()=>{if(window.innerWidth>768)closeMenu()});
-function downloadExcel(dept){
-  if(typeof XLSX==='undefined'){alert('No se pudo cargar el módulo de Excel. Revisa tu conexión a Internet.');return}
-  const rs=filtered(dept);
-  if(!rs.length){alert('No hay registros visibles para exportar.');return}
-  const cols=Object.keys(rows(dept)[0]||{}).filter(k=>k!=='Visible'&&k!=='Registro visible'&&!k.endsWith('_2'));
-  const clean=rs.map(r=>Object.fromEntries(cols.map(c=>[c,r[c]??''])));
-  const ws=XLSX.utils.json_to_sheet(clean,{header:cols});
-  ws['!cols']=cols.map(c=>({wch:Math.min(35,Math.max(c.length,...clean.slice(0,200).map(r=>String(r[c]??'').length))+2)}));
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,dept.slice(0,31));
-  XLSX.writeFile(wb,`${dept}_filtrado_${new Date().toISOString().slice(0,10)}.xlsx`);
-}
-
+function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light');renderGeneral()}
+function globalSearch(q){let box=document.getElementById('searchResults')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'searchResults',className:'search-results'}));q=q.trim().toLowerCase();if(q.length<2){box.style.display='none';return}let out=[];depts.forEach(d=>baseVis(d).forEach(r=>{if(out.length<50&&Object.values(r).some(v=>String(v??'').toLowerCase().includes(q)))out.push({d,r})}));box.innerHTML=out.length?out.map(x=>`<div class="sr" onclick="show('${x.d}');document.getElementById('searchResults').style.display='none'"> <b>${esc(x.d)}</b> · ${esc(fmtDate(x.r.FECHA))} · ${esc(x.r['NO. OT']||x.r.CLIENTE||x.r['NO. MAQUINA']||'Registro coincidente')}</div>`).join(''):'<div class="sr">Sin resultados</div>';box.style.display='block'}
+async function exportPDF(){const {jsPDF}=window.jspdf||{};if(!jsPDF||!window.html2canvas){alert('No se pudo cargar el módulo PDF.');return}const el=document.getElementById('view'),canvas=await html2canvas(el,{scale:1.5,backgroundColor:getComputedStyle(document.body).getPropertyValue('--bg')});const pdf=new jsPDF('p','mm','a4'),w=190,h=canvas.height*w/canvas.width,img=canvas.toDataURL('image/jpeg',.92);let y=0;pdf.addImage(img,'JPEG',10,y+8,w,h);while(h+y>277){y-=277;pdf.addPage();pdf.addImage(img,'JPEG',10,y+8,w,h)}pdf.save(`Dashboard_Produccion_${new Date().toISOString().slice(0,10)}.pdf`)}
 /* ---------- exportar / carga ---------- */
 function downloadCSV(dept){
   let rs=filtered(dept),cols=Object.keys(rows(dept)[0]||{}).filter(k=>k!=='Visible'&&k!=='Registro visible'&&!k.endsWith('_2'));
   let csv='\ufeff'+[cols.join(','),...rs.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\n');
   let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`${dept}_filtrado.csv`;a.click();URL.revokeObjectURL(a.href);
 }
-document.getElementById('nav')?.addEventListener('click',()=>{if(window.innerWidth<=768)closeMenu()});
-fetch('data.json?v=' + Date.now()).then(r=>r.json()).then(d=>{DATA=d;renderGeneral()}).catch(e=>{document.getElementById('view').innerHTML='<div class="card"><h2>No se pudo cargar data.json</h2><p>Verifica que data.json esté en la misma carpeta que index.html.</p></div>';console.error(e)});
+let DATA_SIGNATURE='';async function loadData(silent=false){try{const r=await fetch('data.json?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json(),sig=JSON.stringify(d);if(sig!==DATA_SIGNATURE){DATA=d;DATA_SIGNATURE=sig;if(!silent||current==='General')show(current);else show(current)}}catch(e){if(!silent)document.getElementById('view').innerHTML='<div class="card"><h2>No se pudo cargar data.json</h2><p>Verifica que esté junto a index.html.</p></div>';console.error(e)}}
+if(localStorage.getItem('theme')==='dark')document.body.classList.add('dark');loadData();setInterval(()=>loadData(true),60000);
 </script>
 </body></html>
