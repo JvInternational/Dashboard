@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JV International — Dashboard de Producción</title>
+<title>JV International — Dashboard de Producción 2.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --ink:#171b21; --muted:#6b7280; --line:#e5e7eb;
@@ -79,10 +80,24 @@ h1,h2,h3{font-family:'Space Grotesk',Inter,sans-serif;font-weight:600;margin:0}
 @media(max-width:1100px){.side{width:190px}.kpis{grid-template-columns:repeat(2,1fr)}.grid,.grid2{grid-template-columns:1fr}.deptgrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.app{display:block}.side{position:static;width:100%;height:auto}.nav{flex-direction:row;overflow-x:auto}.nav button{white-space:nowrap;width:auto}.main{padding:16px}.kpis,.deptgrid{grid-template-columns:1fr}.top{display:block}.updated{display:inline-block;margin-top:10px}}
 ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#d7dbe1;border-radius:4px}
+
+/* Versión 2.0: navegación móvil y controles responsivos */
+.menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:1200;border:0;border-radius:10px;background:#12161d;color:#fff;width:42px;height:42px;font-size:22px;box-shadow:var(--shadow);cursor:pointer}
+.menu-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.46);z-index:1090}
+@media(max-width:768px){
+  .menu-toggle{display:block}.app{display:block}.side{position:fixed;left:-260px;top:0;width:236px;height:100vh;z-index:1100;transition:left .25s ease;box-shadow:8px 0 28px rgba(0,0,0,.2)}
+  .side.open{left:0}.menu-overlay.open{display:block}.main{padding:68px 12px 20px!important;width:100%}
+  .cards,.kpis,.grid,.grid-2,.charts{grid-template-columns:1fr!important}.filters{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .field,.field select,.field input,.btn{width:100%!important}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:720px}
+  h1{font-size:24px!important}.card{border-radius:12px!important}canvas{max-width:100%!important}
+}
+@media(min-width:769px){.side{left:auto!important}}
 </style></head>
 <body>
+<button class="menu-toggle" id="menuToggle" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="app">
-  <aside class="side">
+  <aside class="side" id="sidebar">
     <div class="brand">JV INTERNATIONAL</div>
     <div class="sub">Dashboard de producción</div>
     <div class="nav" id="nav"></div>
@@ -111,7 +126,11 @@ function dkey(v){return v?String(v).slice(0,10):''}
 function fmtDate(v){let k=dkey(v);if(!k)return '—';let p=k.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:k}
 function isNum(v){return typeof v==='number'}
 function rows(dept){return DATA[dept]||[]}
-function visible(dept,r){return dept==='Lavanderia'?Number(r['Registro visible'])===1:Number(r['Visible'])===1}
+function visible(dept,r){
+  const campo=dept==='Lavanderia'?'Registro visible':'Visible';
+  if(!(campo in r)||r[campo]===null||String(r[campo]).trim()==='')return true;
+  return ['1','true','si','sí'].includes(String(r[campo]).trim().toLowerCase());
+}
 function dates(rs){return rs.map(r=>dkey(r.FECHA)).filter(Boolean).sort()}
 function options(rs,key){return [...new Set(rs.map(r=>r[key]).filter(v=>v!==null&&v!==''))].sort((a,b)=>String(a).localeCompare(String(b),'es'))}
 function sum(rs,key){return rs.reduce((a,r)=>a+num(r[key]),0)}
@@ -141,7 +160,8 @@ function filters(dept){
     <div class="field"><label>Filtrar por</label><select id="fDim" onchange="updateValues('${dept}')"><option value="">Todos</option>${opts}</select></div>
     <div class="field"><label>Valor</label><select id="fVal" onchange="renderDept('${dept}')"><option value="">Todos</option></select></div>
     <button class="btn secondary" onclick="resetFilters('${dept}')">Restablecer</button>
-    <button class="btn primary" onclick="downloadCSV('${dept}')">Exportar CSV</button>
+    <button class="btn secondary" onclick="downloadCSV('${dept}')">Exportar CSV</button>
+    <button class="btn primary" onclick="downloadExcel('${dept}')">Exportar Excel</button>
   </div>`;
 }
 function updateValues(dept){let rs=baseVis(dept),dim=document.getElementById('fDim').value,sel=document.getElementById('fVal');sel.innerHTML='<option value="">Todos</option>'+options(rs,dim).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderDept(dept)}
@@ -288,12 +308,29 @@ function renderGeneral(){
   });
 }
 
+/* ---------- versión 2.0: menú móvil y Excel ---------- */
+function toggleMenu(){document.getElementById('sidebar')?.classList.toggle('open');document.getElementById('menuOverlay')?.classList.toggle('open')}
+function closeMenu(){document.getElementById('sidebar')?.classList.remove('open');document.getElementById('menuOverlay')?.classList.remove('open')}
+window.addEventListener('resize',()=>{if(window.innerWidth>768)closeMenu()});
+function downloadExcel(dept){
+  if(typeof XLSX==='undefined'){alert('No se pudo cargar el módulo de Excel. Revisa tu conexión a Internet.');return}
+  const rs=filtered(dept);
+  if(!rs.length){alert('No hay registros visibles para exportar.');return}
+  const cols=Object.keys(rows(dept)[0]||{}).filter(k=>k!=='Visible'&&k!=='Registro visible'&&!k.endsWith('_2'));
+  const clean=rs.map(r=>Object.fromEntries(cols.map(c=>[c,r[c]??''])));
+  const ws=XLSX.utils.json_to_sheet(clean,{header:cols});
+  ws['!cols']=cols.map(c=>({wch:Math.min(35,Math.max(c.length,...clean.slice(0,200).map(r=>String(r[c]??'').length))+2)}));
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,dept.slice(0,31));
+  XLSX.writeFile(wb,`${dept}_filtrado_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
 /* ---------- exportar / carga ---------- */
 function downloadCSV(dept){
   let rs=filtered(dept),cols=Object.keys(rows(dept)[0]||{}).filter(k=>k!=='Visible'&&k!=='Registro visible'&&!k.endsWith('_2'));
   let csv='\ufeff'+[cols.join(','),...rs.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\n');
   let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`${dept}_filtrado.csv`;a.click();URL.revokeObjectURL(a.href);
 }
+document.getElementById('nav')?.addEventListener('click',()=>{if(window.innerWidth<=768)closeMenu()});
 fetch('data.json?v=' + Date.now()).then(r=>r.json()).then(d=>{DATA=d;renderGeneral()}).catch(e=>{document.getElementById('view').innerHTML='<div class="card"><h2>No se pudo cargar data.json</h2><p>Verifica que data.json esté en la misma carpeta que index.html.</p></div>';console.error(e)});
 </script>
 </body></html>
