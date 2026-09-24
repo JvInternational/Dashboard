@@ -1,16 +1,8 @@
-[README.md](https://github.com/user-attachments/files/32581068/README.md)
-# Dashboard de Producción v4
+[README.md](https://github.com/user-attachments/files/32629318/README.md)
+# Dashboard de Producción V4.1 Final
 
-Archivos listos para GitHub Pages. Reemplace `index.html` y conserve `data.json` en la misma carpeta.
+Suba los cuatro archivos principales a la raíz del repositorio: `index.html`, `data.json`, `Logo_JV_International.png` y `ajustes-v4-1.js`.
 
-## Incluye
-- Filtro global de período heredable por las áreas.
-- Vistas verticales sin desplazamiento horizontal de gráficas.
-- Filtros persistentes y contextuales.
-- Tiempo muerto en minutos y horas, por motivo y máquina.
-- PDF formal: General en 2 páginas y áreas en 1 página A4 horizontal.
-- Horas de Lavandería en HH:mm y duración calculada.
-- Encabezados Notas homologados como Comentarios.
-- Logo corporativo en el panel lateral.
+Incluye: logo PNG, tablas sin separadores en identificadores, Registros del período, horas de Lavandería como Hora inicio/Hora fin, Duración después de Hora fin, y etiquetas contextuales para valores vacíos.
 
-La generación PDF utiliza jsPDF desde CDN y requiere conexión a Internet.
+El archivo `Logo_JV_International.png` puede sustituirse por el PNG corporativo original manteniendo exactamente el mismo nombre.
