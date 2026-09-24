@@ -23,13 +23,243 @@ const DEPTS=Object.keys(CFG),LABEL={'NO. MAQUINA':'Máquina','TIPO DE PRENDA':'T
 const EMPTY={'NO. MAQUINA':'Sin máquina','TIPO DE PRENDA':'Sin tipo de prenda','TIPO DE HIT':'Sin tipo de hit',ESPECIALIDAD:'Sin especialidad',MOTIVO:'Sin motivo',PROCESO:'Sin proceso',DEPT:'Sin departamento',DEPTO:'Sin departamento',CLIENTE:'Sin cliente',TIENDA:'Sin tienda','TIPO DE EMPAQUE':'Sin tipo de empaque','TIPO DE PROCESO':'Sin tipo de proceso',COLOR:'Sin color'};
 const IDS=new Set(['FOLIO','NO. WO','ESTILO','NO. MAQUINA','NO. FOLDER']);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), num=v=>Number.isFinite(Number(v))?Number(v):0, fmt=v=>new Intl.NumberFormat('es-MX',{maximumFractionDigits:0}).format(num(v)), dateKey=v=>String(v||'').slice(0,10), dateFmt=v=>{let p=dateKey(v).split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:'—'}, empty=v=>v==null||String(v).trim()==='', sum=(a,k)=>a.reduce((s,r)=>s+num(r[k]),0), time=v=>`${fmt(v)} min / ${(num(v)/60).toFixed(1)} hrs`;
-function periodMonths(){return [...new Set(DEPTS.flatMap(d=>DATA[d].map(r=>dateKey(r.FECHA).slice(0,7))).filter(Boolean))].sort().reverse()}
-function range(){let ms=periodMonths();if(!PERIOD)PERIOD=ms[0]||'';let [y,m]=PERIOD.split('-').map(Number);return [`${y}-${String(m).padStart(2,'0')}-01`,new Date(Date.UTC(y,m,0)).toISOString().slice(0,10)]}
+function periodMonths(){
+
+  const months = new Set();
+
+  DEPTS.forEach(dept => {
+
+    (DATA[dept] || []).forEach(r => {
+
+      const fecha = dateKey(r.FECHA);
+
+      if(!fecha) return;
+
+      months.add(
+        fecha.slice(0,7)
+      );
+
+    });
+
+  });
+
+  return [...months]
+    .sort()
+    .reverse();
+}
+function range(){
+
+  const allDates =
+    DEPTS.flatMap(
+      d =>
+        (DATA[d] || [])
+          .map(r => dateKey(r.FECHA))
+          .filter(Boolean)
+    )
+    .sort();
+
+  const minDate =
+    allDates[0];
+
+  const maxDate =
+    allDates.at(-1);
+
+  if(PERIOD === 'all'){
+
+    return [
+      minDate,
+      maxDate
+    ];
+
+  }
+
+  if(PERIOD === '30'){
+
+    let end =
+      new Date(maxDate);
+
+    let start =
+      new Date(end);
+
+    start.setDate(
+      start.getDate() - 29
+    );
+
+    return [
+      start.toISOString().slice(0,10),
+      maxDate
+    ];
+  }
+
+  if(PERIOD === '90'){
+
+    let end =
+      new Date(maxDate);
+
+    let start =
+      new Date(end);
+
+    start.setDate(
+      start.getDate() - 89
+    );
+
+    return [
+      start.toISOString().slice(0,10),
+      maxDate
+    ];
+  }
+
+  if(PERIOD === 'current'){
+
+    return [
+      maxDate.slice(0,7) + '-01',
+      maxDate
+    ];
+  }
+
+  let [y,m] =
+    PERIOD.split('-')
+      .map(Number);
+
+  return [
+
+    `${y}-${String(m)
+      .padStart(2,'0')}-01`,
+
+    new Date(
+      Date.UTC(y,m,0)
+    )
+    .toISOString()
+    .slice(0,10)
+
+  ];
+}
 function rows(d){let [a,b]=range();return (DATA[d]||[]).filter(r=>{let k=dateKey(r.FECHA);return k>=a&&k<=b})}
 function monthLabel(){let [y,m]=PERIOD.split('-');return new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(`${y}-${m}-01T00:00:00Z`))}
 function nav(){document.querySelector('#nav').innerHTML=['General',...DEPTS].map(d=>`<button class="${PAGE===d?'active':''}" onclick="show('${d}')">${d==='Lavanderia'?'Lavandería':d}</button>`).join('')}
-function periodTools(){let [a,b]=range();return `<div class="tools"><div class="field"><label>Período activo</label><select onchange="PERIOD=this.value;localStorage.setItem('jvPeriod',PERIOD);STATE={};show(PAGE)">${periodMonths().map(m=>`<option value="${m}" ${m===PERIOD?'selected':''}>${monthName(m)}</option>`).join('')}</select></div><div class="periodInfo"><b>Período activo</b>${dateFmt(a)} – ${dateFmt(b)}</div><button class="btn" onclick="pdfGeneral()">Exportar PDF</button></div>`}
+function periodTools(){
+
+  return `
+    <div class="tools">
+
+      <div class="field">
+
+        <label>Período activo</label>
+
+        <select
+          onchange="
+            PERIOD=this.value;
+            localStorage.setItem(
+              'jvPeriod',
+              PERIOD
+            );
+            STATE={};
+            show(PAGE);
+          "
+        >
+
+          <option
+            value="all"
+            ${PERIOD==='all'?'selected':''}
+          >
+            Todo el histórico
+          </option>
+
+          <option
+            value="current"
+            ${PERIOD==='current'?'selected':''}
+          >
+            Mes actual
+          </option>
+
+          <option
+            value="30"
+            ${PERIOD==='30'?'selected':''}
+          >
+            Últimos 30 días
+          </option>
+
+          <option
+            value="90"
+            ${PERIOD==='90'?'selected':''}
+          >
+            Últimos 90 días
+          </option>
+
+          ${periodMonths()
+            .map(m => `
+              <option
+                value="${m}"
+                ${m===PERIOD?'selected':''}
+              >
+                ${monthName(m)}
+              </option>
+            `)
+            .join('')
+          }
+
+        </select>
+
+      </div>
+
+      <div class="periodInfo">
+
+        <b>Período activo</b>
+
+        ${periodText()}
+
+      </div>
+
+      <button
+        class="btn"
+        onclick="pdfGeneral()"
+      >
+        Exportar PDF
+      </button>
+
+    </div>
+  `;
+}
 function monthName(m){let [y,x]=m.split('-');return new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(`${y}-${x}-01T00:00:00Z`))}
+ function periodText(){
+
+  const [a,b] =
+    range();
+
+  if(PERIOD === 'all')
+    return `
+      Todo el histórico
+      <br>
+      ${dateFmt(a)} – ${dateFmt(b)}
+    `;
+
+  if(PERIOD === 'current')
+    return `
+      Mes actual
+      <br>
+      ${dateFmt(a)} – ${dateFmt(b)}
+    `;
+
+  if(PERIOD === '30')
+    return `
+      Últimos 30 días
+      <br>
+      ${dateFmt(a)} – ${dateFmt(b)}
+    `;
+
+  if(PERIOD === '90')
+    return `
+      Últimos 90 días
+      <br>
+      ${dateFmt(a)} – ${dateFmt(b)}
+    `;
+
+  return `
+    ${monthName(PERIOD)}
+    <br>
+    ${dateFmt(a)} – ${dateFmt(b)}
+  `;
+}
 function downtime(rs){return rs.reduce((s,r)=>s+num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']),0)}
 function group(rs,key,value){let m={};rs.forEach(r=>{let k=empty(r[key])?(EMPTY[key]||'Sin información'):String(r[key]).trim();m[k]=(m[k]||0)+num(r[value])});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
 function downGroup(rs,key){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(v){let k=empty(r[key])?(EMPTY[key]||'Sin información'):String(r[key]).trim();m[k]=(m[k]||0)+v}});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
@@ -50,5 +280,24 @@ function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),do
 function show(d){d==='General'?general():area(d)}
 function pdfArea(d){alert('La siguiente iteración implementará el PDF del área después de validar la pantalla clean.')}
 function pdfGeneral(){alert('El PDF Designer (1) se implementará después de validar esta pantalla General clean.')}
-fetch('data.json?v='+Date.now()).then(r=>r.json()).then(j=>{DATA=j;PERIOD=PERIOD||periodMonths()[0];general()}).catch(e=>document.querySelector('#view').innerHTML='<div class="panel"><b>No se pudo cargar data.json.</b></div>');
+fetch('data.json?v='+Date.now())
+.then(r=>r.json())
+.then(j=>{
+
+  DATA=j;
+
+  PERIOD =
+    PERIOD || 'all';
+
+  general();
+
+})
+.catch(e=>{
+
+  document.querySelector(
+    '#view'
+  ).innerHTML =
+    '<div class="panel"><b>No se pudo cargar data.json.</b></div>';
+
+});
 </script></body></html>
