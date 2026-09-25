@@ -154,7 +154,11 @@ function periodTools(){
               PERIOD
             );
             STATE={};
-            show(PAGE);
+            setTimeout(
+  () => show(PAGE),
+  10
+);
+
           "
         >
 
@@ -277,6 +281,111 @@ function trend(
   color
 ){
 
+  let map = {};
+
+  rs.forEach(r => {
+
+    let fecha =
+      dateKey(r.FECHA);
+
+    if(!fecha) return;
+
+    map[fecha] =
+      (map[fecha] || 0)
+      + num(r[key]);
+
+  });
+
+  let points =
+    Object.entries(map)
+      .sort();
+
+  if(CHART){
+    CHART.destroy();
+    CHART = null;
+  }
+
+  const canvas =
+    document.getElementById(id);
+
+  if(!canvas){
+
+    console.warn(
+      'Canvas no encontrado:',
+      id
+    );
+
+    return;
+  }
+
+  if(points.length === 0){
+
+    console.warn(
+      'Sin datos para gráfica:',
+      id
+    );
+
+    return;
+  }
+
+  CHART =
+    new Chart(
+      canvas.getContext('2d'),
+      {
+        type:'line',
+
+        data:{
+          labels:
+            points.map(
+              x => dateFmt(x[0])
+            ),
+
+          datasets:[
+            {
+              data:
+                points.map(
+                  x => x[1]
+                ),
+
+              borderColor:
+                color,
+
+              backgroundColor:
+                color + '20',
+
+              fill:true,
+
+              tension:0.3,
+
+              pointRadius:2,
+
+              borderWidth:2
+            }
+          ]
+        },
+
+        options:{
+          responsive:true,
+
+          maintainAspectRatio:false,
+
+          plugins:{
+            legend:{
+              display:false
+            }
+          },
+
+          scales:{
+            y:{
+              beginAtZero:true
+            }
+          }
+        }
+      }
+    );
+
+}
+
   let m = {};
 
   rs.forEach(r => {
@@ -381,7 +490,10 @@ fetch('data.json?v='+Date.now())
   PERIOD =
     PERIOD || 'all';
 
-  general();
+  setTimeout(
+  () => general(),
+  10
+);
 
 })
 .catch(e=>{
