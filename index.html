@@ -135,7 +135,37 @@ function range(){
   ];
 }
 function rows(d){let [a,b]=range();return (DATA[d]||[]).filter(r=>{let k=dateKey(r.FECHA);return k>=a&&k<=b})}
-function monthLabel(){let [y,m]=PERIOD.split('-');return new Intl.DateTimeFormat('es-MX',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(`${y}-${m}-01T00:00:00Z`))}
+function monthLabel(){
+
+  if(PERIOD === 'all')
+    return 'Todo el histórico';
+
+  if(PERIOD === 'current')
+    return 'Mes actual';
+
+  if(PERIOD === '30')
+    return 'Últimos 30 días';
+
+  if(PERIOD === '90')
+    return 'Últimos 90 días';
+
+  let [y,m] =
+    PERIOD.split('-');
+
+  return new Intl.DateTimeFormat(
+    'es-MX',
+    {
+      month:'long',
+      year:'numeric',
+      timeZone:'UTC'
+    }
+  ).format(
+    new Date(
+      `${y}-${m}-01T00:00:00Z`
+    )
+  );
+
+}
 function nav(){document.querySelector('#nav').innerHTML=['General',...DEPTS].map(d=>`<button class="${PAGE===d?'active':''}" onclick="show('${d}')">${d==='Lavanderia'?'Lavandería':d}</button>`).join('')}
 function periodTools(){
 
@@ -270,7 +300,35 @@ function downGroup(rs,key){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (M
 function bars(a,color,timeMode=false){let mx=a[0]?.[1]||1,tot=a.reduce((s,x)=>s+x[1],0);return `<div class="bars">${a.map(([k,v])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${timeMode?time(v):fmt(v)} · ${tot?(v/tot*100).toFixed(1):0}%</div><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${color}"></div></div></div>`).join('')||'<div class="empty">0</div>'}</div>`}
 function machines(rs){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(!v)return;let ma=empty(r['NO. MAQUINA'])?'Sin máquina':r['NO. MAQUINA'],mo=empty(r.MOTIVO)?'Sin motivo':r.MOTIVO;m[ma]??={t:0,r:{}};m[ma].t+=v;m[ma].r[mo]=(m[ma].r[mo]||0)+v});return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,6).map(([ma,o])=>{let [mo,v]=Object.entries(o.r).sort((a,b)=>b[1]-a[1])[0];return `<div class="machine"><strong>${esc(ma)}</strong><div class="total">${time(o.t)}</div><div class="reason">Principal motivo<b>${esc(mo)} · ${(v/o.t*100).toFixed(1)}%</b></div></div>`}).join('')||'<div class="empty">Sin tiempo muerto por máquina</div>'}
 function general(){PAGE='General';nav();let s=DEPTS.map(d=>{let r=rows(d),c=CFG[d];return {d,r,c,total:sum(r,c.value),down:downtime(r)}}),prod=[...s].sort((a,b)=>b.total-a.total),dw=[...s].sort((a,b)=>b.down-a.down),td=s.reduce((z,x)=>z+x.down,0),all=s.flatMap(x=>x.r);document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta la información de producción por área.</div></div>${periodTools()}</header><section class="panel"><h2 class="sectionTitle">Áreas de producción</h2><div class="areas">${s.map(x=>`<article class="card area" style="--accent:${x.c.accent}" onclick="show('${x.d}')"><b>${x.c.title.toUpperCase()}</b><div class="value">${fmt(x.total)}</div><div class="note">${fmt(x.r.length)} registros del período</div></article>`).join('')}</div></section><section class="executive"><article class="exec card"><div class="klabel">Mayor producción</div><div class="value">${fmt(prod[0].total)}</div><small>${prod[0].c.title}</small></article><article class="exec card"><div class="klabel">Tiempo muerto total</div><div class="value">${time(td)}</div><small>Áreas con registro</small></article><article class="exec card"><div class="klabel">Mayor tiempo muerto</div><div class="value">${time(dw[0].down)}</div><small>${dw[0].c.title}</small></article><article class="exec card"><div class="klabel">Áreas activas</div><div class="value">${s.filter(x=>x.r.length).length}</div><small>Con registros</small></article></section><div class="charts"><section class="panel"><h2 class="sectionTitle">Producción total por área (piezas)</h2>${bars(prod.map(x=>[x.c.title,x.total]),'#08776b')}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por área</h2>${bars(dw.map(x=>[x.c.title,x.down]),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Principales motivos de tiempo muerto</h2>${bars(downGroup(all,'MOTIVO'),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Máquinas con mayor incidencia</h2><div class="machineGrid">${machines(all)}</div></section></div>`}
-function state(d){if(!STATE[d]){let [a,b]=range();STATE[d]={a,b,key:'',val:''}}return STATE[d]}
+function state(d){
+
+  let [a,b] = range();
+
+  if(
+    !STATE[d]
+    ||
+    STATE[d].period !== PERIOD
+  ){
+
+    STATE[d] = {
+
+      period : PERIOD,
+
+      a,
+
+      b,
+
+      key : '',
+
+      val : ''
+
+    };
+
+  }
+
+  return STATE[d];
+
+}
 function filtered(d){let st=state(d);return (DATA[d]||[]).filter(r=>{let k=dateKey(r.FECHA),ok=k>=st.a&&k<=st.b;if(st.key&&st.val)ok=ok&&(st.val==='__EMPTY__'?empty(r[st.key]):String(r[st.key])===st.val);return ok})}
 function filterUI(d){let c=CFG[d],st=state(d),base=DATA[d]||[],vals=st.key?[...new Set(base.filter(r=>!empty(r[st.key])).map(r=>String(r[st.key])))].sort():[],has=st.key&&base.some(r=>empty(r[st.key]));return `<div class="panel filters"><div class="field"><label>Desde</label><input type="date" value="${st.a}" onchange="STATE['${d}'].a=this.value;area('${d}')"></div><div class="field"><label>Hasta</label><input type="date" value="${st.b}" onchange="STATE['${d}'].b=this.value;area('${d}')"></div><div class="field"><label>Filtrar por</label><select onchange="STATE['${d}'].key=this.value;STATE['${d}'].val='';area('${d}')"><option value="">Sin filtro adicional</option>${c.groups.map(k=>`<option value="${k}" ${st.key===k?'selected':''}>${LABEL[k]}</option>`).join('')}</select></div><div class="field"><label>Selección</label><select ${st.key?'':'disabled'} onchange="STATE['${d}'].val=this.value;area('${d}')"><option value="">Todos</option>${vals.map(v=>`<option ${st.val===v?'selected':''}>${esc(v)}</option>`).join('')}${has?`<option value="__EMPTY__" ${st.val==='__EMPTY__'?'selected':''}>${EMPTY[st.key]}</option>`:''}</select></div><button class="btn" onclick="delete STATE['${d}'];area('${d}')">Restablecer</button><button class="btn" onclick="pdfArea('${d}')">Exportar PDF</button></div>`}
 function unique(rs,k){return new Set(rs.map(r=>r[k]).filter(v=>!empty(v))).size}
@@ -281,24 +339,22 @@ function trend(
   color
 ){
 
-  let map = {};
+  let m = {};
 
   rs.forEach(r => {
 
-    let fecha =
-      dateKey(r.FECHA);
+    const fecha = dateKey(r.FECHA);
 
     if(!fecha) return;
 
-    map[fecha] =
-      (map[fecha] || 0)
+    m[fecha] =
+      (m[fecha] || 0)
       + num(r[key]);
 
   });
 
-  let points =
-    Object.entries(map)
-      .sort();
+  const points =
+    Object.entries(m).sort();
 
   if(CHART){
     CHART.destroy();
@@ -309,22 +365,14 @@ function trend(
     document.getElementById(id);
 
   if(!canvas){
-
     console.warn(
       'Canvas no encontrado:',
       id
     );
-
     return;
   }
 
-  if(points.length === 0){
-
-    console.warn(
-      'Sin datos para gráfica:',
-      id
-    );
-
+  if(!points.length){
     return;
   }
 
@@ -337,14 +385,14 @@ function trend(
         data:{
           labels:
             points.map(
-              x => dateFmt(x[0])
+              p => dateFmt(p[0])
             ),
 
           datasets:[
             {
               data:
                 points.map(
-                  x => x[1]
+                  p => p[1]
                 ),
 
               borderColor:
@@ -381,93 +429,7 @@ function trend(
             }
           }
         }
-      }
-    );
 
-}
-
-  let m = {};
-
-  rs.forEach(r => {
-
-    let k =
-      dateKey(r.FECHA);
-
-    m[k] =
-      (m[k] || 0)
-      + num(r[key]);
-
-  });
-
-  let a =
-    Object
-      .entries(m)
-      .sort();
-
-  if(CHART)
-    CHART.destroy();
-
-  let el =
-    document.getElementById(id);
-
-  if(!el){
-    console.warn(
-      'Canvas no encontrado:',
-      id
-    );
-    return;
-  }
-
-  if(!a.length){
-    return;
-  }
-
-  CHART =
-    new Chart(
-      el.getContext('2d'),
-      {
-        type:'line',
-
-        data:{
-          labels:a.map(
-            x => dateFmt(x[0])
-          ),
-
-          datasets:[
-            {
-              data:a.map(
-                x => x[1]
-              ),
-
-              borderColor:color,
-
-              backgroundColor:
-                color + '20',
-
-              fill:true,
-
-              tension:.3
-            }
-          ]
-        },
-
-        options:{
-          responsive:true,
-
-          maintainAspectRatio:false,
-
-          plugins:{
-            legend:{
-              display:false
-            }
-          },
-
-          scales:{
-            y:{
-              beginAtZero:true
-            }
-          }
-        }
       }
     );
 
@@ -477,7 +439,7 @@ function table(d,rs){let cols=Object.keys(DATA[d]?.[0]||{}).filter(k=>k&&k!=='Vi
 function hour(v){let m=String(v||'').match(/(?:T|^)(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:'—'}function duration(a,b){a=hour(a);b=hour(b);if(a==='—'||b==='—')return '—';let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),z=x*60+y-h*60-m;if(z<0)z+=1440;return `${Math.floor(z/60)?Math.floor(z/60)+'h ':''}${z%60}m`}
 function laundryType(r){return /lienzo|tela/i.test(String(r['TIPO DE PRENDA']||''))?'Lienzos':'Prendas'}
 function stack(rs,key){let m={};rs.forEach(r=>{let k=key==='FECHA'?dateFmt(r.FECHA):(empty(r[key])?(EMPTY[key]||'Sin información'):r[key]),t=laundryType(r);m[k]??={Lienzos:0,Prendas:0};m[k][t]+=num(r['TOTAL KGS'])});let a=Object.entries(m).sort((x,y)=>(y[1].Lienzos+y[1].Prendas)-(x[1].Lienzos+x[1].Prendas)),mx=Math.max(1,...a.map(x=>x[1].Lienzos+x[1].Prendas));return `<div class="legend"><i class="sw" style="background:#08776b"></i>Lienzos<i class="sw" style="background:#b8da45"></i>Prendas</div><div class="bars">${a.map(([k,o])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${fmt(o.Lienzos+o.Prendas)} kg</div><div class="track" style="display:flex"><div class="fill" style="width:${o.Lienzos/mx*100}%;background:#08776b"></div><div class="fill" style="width:${o.Prendas/mx*100}%;background:#b8da45"></div></div></div>`).join('')}</div>`}
-function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${monthLabel()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Detalle por color</h2>${bars(group(r,'COLOR','TOTAL KGS'),c.accent)}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
+function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Detalle por color</h2>${bars(group(r,'COLOR','TOTAL KGS'),c.accent)}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
 function show(d){d==='General'?general():area(d)}
 function pdfArea(d){alert('La siguiente iteración implementará el PDF del área después de validar la pantalla clean.')}
 function pdfGeneral(){alert('El PDF Designer (1) se implementará después de validar esta pantalla General clean.')}
