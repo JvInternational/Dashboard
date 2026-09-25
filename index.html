@@ -560,8 +560,16 @@ function pdfFlatBars(pdf, x, y, w, title, items, colorFn, valueFmt, labelW, rowH
   }
 
   const maxVal = Math.max(1, ...items.map(it => it[1]));
+
+  // El espacio para el valor (a la derecha de la barra) se reserva según el
+  // ancho real del texto más largo que se vaya a imprimir — así nunca se
+  // corta ni se monta con la columna vecina, sin importar si el formato es
+  // corto ("1,234") o largo ("1,234 min / 20.6 hrs (45.5%)").
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
+  const valueTexts = items.map(it => valueFmt(it[1]));
+  const valueW = Math.max(...valueTexts.map(t => pdf.getTextWidth(t)));
   const barX0 = x + labelW;
-  const barW = w - labelW - 30;
+  const barW = Math.max(18, w - labelW - valueW - 6);
   items.forEach((it, i) => {
     const yy = top + i*rowH;
     pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8.3);
@@ -572,8 +580,9 @@ function pdfFlatBars(pdf, x, y, w, title, items, colorFn, valueFmt, labelW, rowH
     const fw = Math.max(0.8, barW * (it[1] / maxVal));
     pdf.setFillColor(...colorFn(it[0]));
     pdf.roundedRect(barX0, yy-3, fw, 3, 1, 1, 'F');
-    pdf.setFontSize(8);
-    pdf.text(valueFmt(it[1]), barX0 + barW + 3, yy);
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
+    pdf.setTextColor(...C_INK);
+    pdf.text(valueTexts[i], barX0 + barW + 3, yy);
   });
   return top + items.length*rowH;
 }
@@ -689,6 +698,11 @@ function pdfArea(d){
     }
   }
 
+  // Lavandería trabaja en dos unidades a la vez (piezas y kilos); estos
+  // grupos genéricos siempre suman CANTIDAD DE PIEZAS, así que se aclara
+  // la unidad en el título para que nunca quede ambiguo qué se está viendo.
+  const unitSuffix = d === 'Lavanderia' ? ' (piezas)' : '';
+
   const groups = c.groups || [];
   for(let i = 0; i < groups.length; i += 2){
     const k1 = groups[i], k2 = groups[i+1];
@@ -696,29 +710,31 @@ function pdfArea(d){
     const items2 = k2 ? group(r, k2, c.value).slice(0, 10) : [];
     const rowH = 8;
     ensureSpace(9 + Math.max(items1.length, items2.length, 1)*rowH);
-    const b1 = pdfFlatBars(pdf, PDF_MARGIN, cursorY, PDF_COL_W, `Detalle por ${LABEL[k1]||k1}`,
+    const b1 = pdfFlatBars(pdf, PDF_MARGIN, cursorY, PDF_COL_W, `Detalle por ${LABEL[k1]||k1}${unitSuffix}`,
       items1, areaColor, v => fmt(v), 30, rowH);
     let b2 = b1;
     if(k2){
-      b2 = pdfFlatBars(pdf, PDF_COL2_X, cursorY, PDF_COL_W, `Detalle por ${LABEL[k2]||k2}`,
+      b2 = pdfFlatBars(pdf, PDF_COL2_X, cursorY, PDF_COL_W, `Detalle por ${LABEL[k2]||k2}${unitSuffix}`,
         items2, areaColor, v => fmt(v), 30, rowH);
     }
     cursorY = Math.max(b1, b2) + 10;
   }
 
   if(c.down){
+    // "Tiempo muerto por máquina" va apilada debajo de "Tiempo muerto por
+    // motivo" (misma columna izquierda), igual que en el informe general.
     const motivos = downGroup(r, 'MOTIVO').slice(0, 8);
     const maquinas = downGroup(r, 'NO. MAQUINA').slice(0, 8);
     const rowH = 8;
-    ensureSpace(9 + Math.max(motivos.length, maquinas.length, 1)*rowH);
+    ensureSpace(9 + motivos.length*rowH + 10 + 9 + maquinas.length*rowH);
     const totMot = motivos.reduce((s,x)=>s+x[1],0);
     const totMaq = maquinas.reduce((s,x)=>s+x[1],0);
     const b1 = pdfFlatBars(pdf, PDF_MARGIN, cursorY, PDF_COL_W, 'Tiempo muerto por motivo',
       motivos, () => C_ALERT, v => `${time(v)} (${totMot?(v/totMot*100).toFixed(1):0}%)`, 38, rowH);
-    const b2 = pdfFlatBars(pdf, PDF_COL2_X, cursorY, PDF_COL_W, 'Tiempo muerto por m\u00e1quina',
+    const b2 = pdfFlatBars(pdf, PDF_MARGIN, b1+10, PDF_COL_W, 'Tiempo muerto por m\u00e1quina',
       maquinas.map(x => [`M\u00e1quina ${x[0]}`, x[1]]), () => C_ALERT,
       v => `${time(v)} (${totMaq?(v/totMaq*100).toFixed(1):0}%)`, 26, rowH);
-    cursorY = Math.max(b1, b2) + 10;
+    cursorY = b2 + 10;
   }
 
   pdfFooter(pdf);
