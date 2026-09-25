@@ -442,7 +442,523 @@ function stack(rs,key){let m={};rs.forEach(r=>{let k=key==='FECHA'?dateFmt(r.FEC
 function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Detalle por color</h2>${bars(group(r,'COLOR','TOTAL KGS'),c.accent)}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
 function show(d){d==='General'?general():area(d)}
 function pdfArea(d){alert('La siguiente iteración implementará el PDF del área después de validar la pantalla clean.')}
-function pdfGeneral(){alert('El PDF Designer (1) se implementará después de validar esta pantalla General clean.')}
+function pdfGeneral(){
+
+  if(!window.jspdf){
+    alert('No se pudo cargar jsPDF');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf = new jsPDF({
+    orientation:'landscape',
+    unit:'mm',
+    format:'a4'
+  });
+
+  const W = 297;
+  const H = 210;
+
+  const GREEN = [15,110,99];
+  const LIME  = [184,218,69];
+  const INK   = [23,59,53];
+
+  const [from,to] = range();
+
+  const period =
+    `${dateFmt(from)} - ${dateFmt(to)}`;
+
+  const stats =
+    DEPTS.map(d=>{
+
+      let rs = rows(d);
+      let c  = CFG[d];
+
+      return {
+
+        area  : c.title,
+
+        total : sum(rs,c.value),
+
+        down  : downtime(rs),
+
+        rows  : rs.length
+
+      };
+
+    });
+
+  const prod =
+    [...stats]
+      .sort((a,b)=>b.total-a.total);
+
+  const dead =
+    [...stats]
+      .sort((a,b)=>b.down-a.down);
+
+  const totalDown =
+    stats.reduce(
+      (a,x)=>a+x.down,
+      0
+    );
+
+  function footer(){
+
+    pdf.setDrawColor(220);
+
+    pdf.line(
+      10,
+      198,
+      287,
+      198
+    );
+
+    pdf.setFontSize(7);
+
+    pdf.setTextColor(110);
+
+    pdf.text(
+      'JV International Solutions Inc.',
+      10,
+      203
+    );
+
+    pdf.text(
+      new Date().toLocaleString('es-MX'),
+      230,
+      203
+    );
+
+  }
+
+  function header(title,page,total){
+
+    pdf.setTextColor(...INK);
+
+    pdf.setFontSize(18);
+
+    pdf.setFont(
+      'helvetica',
+      'bold'
+    );
+
+    pdf.text(
+      'JV INTERNATIONAL',
+      12,
+      14
+    );
+
+    pdf.setFontSize(8);
+
+    pdf.text(
+      'SOLUTIONS INC.',
+      12,
+      19
+    );
+
+    pdf.setFontSize(16);
+
+    pdf.text(
+      title,
+      12,
+      31
+    );
+
+    pdf.setFontSize(8);
+
+    pdf.text(
+      'Período: ' + period,
+      12,
+      37
+    );
+
+    pdf.text(
+      `Página ${page} de ${total}`,
+      255,
+      12
+    );
+
+  }
+
+  function card(
+    x,
+    y,
+    w,
+    title,
+    value,
+    subtitle=''
+  ){
+
+    pdf.setFillColor(
+      247,
+      250,
+      249
+    );
+
+    pdf.setDrawColor(
+      ...GREEN
+    );
+
+    pdf.roundedRect(
+      x,
+      y,
+      w,
+      24,
+      2,
+      2,
+      'FD'
+    );
+
+    pdf.setFontSize(7);
+
+    pdf.setTextColor(90);
+
+    pdf.text(
+      title.toUpperCase(),
+      x+4,
+      y+6
+    );
+
+    pdf.setTextColor(
+      ...INK
+    );
+
+    pdf.setFont(
+      'helvetica',
+      'bold'
+    );
+
+    pdf.setFontSize(13);
+
+    pdf.text(
+      String(value),
+      x+4,
+      y+15
+    );
+
+    pdf.setFont(
+      'helvetica',
+      'normal'
+    );
+
+    pdf.setFontSize(7);
+
+    pdf.text(
+      String(subtitle),
+      x+4,
+      y+21
+    );
+
+  }
+
+  function bars(
+    title,
+    list,
+    x,
+    y,
+    w,
+    h,
+    timeMode=false
+  ){
+
+    pdf.setTextColor(
+      ...INK
+    );
+
+    pdf.setFont(
+      'helvetica',
+      'bold'
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.text(
+      title,
+      x,
+      y
+    );
+
+    let max =
+      list[0]?.[1] || 1;
+
+    list
+      .slice(0,8)
+      .forEach((row,i)=>{
+
+        const yy =
+          y+10+i*10;
+
+        pdf.setFontSize(7);
+
+        pdf.setFont(
+          'helvetica',
+          'normal'
+        );
+
+        pdf.text(
+          row[0],
+          x,
+          yy
+        );
+
+        pdf.setFillColor(
+          230,
+          237,
+          235
+        );
+
+        pdf.rect(
+          x+42,
+          yy-3,
+          w-75,
+          3,
+          'F'
+        );
+
+        pdf.setFillColor(
+          ...GREEN
+        );
+
+        pdf.rect(
+          x+42,
+          yy-3,
+          ((w-75)*row[1])/max,
+          3,
+          'F'
+        );
+
+        pdf.text(
+          timeMode
+            ? time(row[1])
+            : fmt(row[1]),
+          x+w-28,
+          yy
+        );
+
+      });
+
+  }
+
+  /* --------------------------------
+     PAGINA 1
+  -------------------------------- */
+
+  header(
+    'Informe General de Producción',
+    1,
+    2
+  );
+
+  card(
+    10,
+    45,
+    65,
+    'Mayor producción',
+    fmt(prod[0]?.total || 0),
+    prod[0]?.area || ''
+  );
+
+  card(
+    80,
+    45,
+    65,
+    'Tiempo muerto total',
+    time(totalDown)
+  );
+
+  card(
+    150,
+    45,
+    65,
+    'Mayor tiempo muerto',
+    time(dead[0]?.down || 0),
+    dead[0]?.area || ''
+  );
+
+  card(
+    220,
+    45,
+    65,
+    'Áreas activas',
+    stats.filter(
+      x=>x.rows
+    ).length
+  );
+
+  bars(
+    'Producción total por área',
+    prod.map(
+      x=>[
+        x.area,
+        x.total
+      ]
+    ),
+    10,
+    85,
+    276,
+    60
+  );
+
+  bars(
+    'Tiempo muerto por área',
+    dead.map(
+      x=>[
+        x.area,
+        x.down
+      ]
+    ),
+    10,
+    150,
+    276,
+    40,
+    true
+  );
+
+  footer();
+
+  /* --------------------------------
+     PAGINA 2
+  -------------------------------- */
+
+  pdf.addPage();
+
+  header(
+    'Informe General de Producción',
+    2,
+    2
+  );
+
+  let all =
+    DEPTS.flatMap(
+      d=>rows(d)
+    );
+
+  let motivos =
+    downGroup(
+      all,
+      'MOTIVO'
+    );
+
+  let maquinas =
+    downGroup(
+      all,
+      'NO. MAQUINA'
+    );
+
+  bars(
+    'Principales motivos de tiempo muerto',
+    motivos,
+    10,
+    50,
+    133,
+    100,
+    true
+  );
+
+  bars(
+    'Máquinas con mayor incidencia',
+    maquinas,
+    150,
+    50,
+    133,
+    100,
+    true
+  );
+
+  let lav =
+    rows('Lavanderia');
+
+  const totalKg =
+    sum(
+      lav,
+      'TOTAL KGS'
+    );
+
+  let lienzos=0;
+  let prendas=0;
+
+  lav.forEach(r=>{
+
+    let kg =
+      num(
+        r['TOTAL KGS']
+      );
+
+    if(
+      laundryType(r)
+      === 'Lienzos'
+    ){
+      lienzos += kg;
+    }else{
+      prendas += kg;
+    }
+
+  });
+
+  card(
+    10,
+    160,
+    60,
+    'Total KG',
+    fmt(totalKg)
+  );
+
+  card(
+    75,
+    160,
+    60,
+    'Lienzos',
+    fmt(lienzos),
+    totalKg
+      ? ((lienzos/totalKg)*100)
+          .toFixed(1)+'%'
+      : '0%'
+  );
+
+  card(
+    140,
+    160,
+    60,
+    'Prendas',
+    fmt(prendas),
+    totalKg
+      ? ((prendas/totalKg)*100)
+          .toFixed(1)+'%'
+      : '0%'
+  );
+
+  pdf.setFontSize(9);
+
+  pdf.setTextColor(
+    ...INK
+  );
+
+  pdf.text(
+    `Mayor volumen procesado: ${prod[0]?.area} registró ${fmt(prod[0]?.total)} piezas durante el período.`,
+    210,
+    170,
+    {
+      maxWidth:70
+    }
+  );
+
+  pdf.text(
+    `Tiempo muerto total: ${time(totalDown)}.`,
+    210,
+    182,
+    {
+      maxWidth:70
+    }
+  );
+
+  footer();
+
+  pdf.save(
+    `Informe_Produccion_General_${PERIOD}.pdf`
+  );
+
+}
 fetch('data.json?v='+Date.now())
 .then(r=>r.json())
 .then(j=>{
