@@ -441,524 +441,340 @@ function laundryType(r){return /lienzo|tela/i.test(String(r['TIPO DE PRENDA']||'
 function stack(rs,key){let m={};rs.forEach(r=>{let k=key==='FECHA'?dateFmt(r.FECHA):(empty(r[key])?(EMPTY[key]||'Sin información'):r[key]),t=laundryType(r);m[k]??={Lienzos:0,Prendas:0};m[k][t]+=num(r['TOTAL KGS'])});let a=Object.entries(m).sort((x,y)=>(y[1].Lienzos+y[1].Prendas)-(x[1].Lienzos+x[1].Prendas)),mx=Math.max(1,...a.map(x=>x[1].Lienzos+x[1].Prendas));return `<div class="legend"><i class="sw" style="background:#08776b"></i>Lienzos<i class="sw" style="background:#b8da45"></i>Prendas</div><div class="bars">${a.map(([k,o])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${fmt(o.Lienzos+o.Prendas)} kg</div><div class="track" style="display:flex"><div class="fill" style="width:${o.Lienzos/mx*100}%;background:#08776b"></div><div class="fill" style="width:${o.Prendas/mx*100}%;background:#b8da45"></div></div></div>`).join('')}</div>`}
 function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Detalle por color</h2>${bars(group(r,'COLOR','TOTAL KGS'),c.accent)}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
 function show(d){d==='General'?general():area(d)}
-function pdfArea(d){alert('La siguiente iteración implementará el PDF del área después de validar la pantalla clean.')}
-function pdfGeneral(){
-
-  if(!window.jspdf){
-    alert('No se pudo cargar jsPDF');
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-
-  const pdf = new jsPDF({
-    orientation:'landscape',
-    unit:'mm',
-    format:'a4'
-  });
-
-  const W = 297;
-  const H = 210;
-
-  const GREEN = [15,110,99];
-  const LIME  = [184,218,69];
-  const INK   = [23,59,53];
-
-  const [from,to] = range();
-
-  const period =
-    `${dateFmt(from)} - ${dateFmt(to)}`;
-
-  const stats =
-    DEPTS.map(d=>{
-
-      let rs = rows(d);
-      let c  = CFG[d];
-
-      return {
-
-        area  : c.title,
-
-        total : sum(rs,c.value),
-
-        down  : downtime(rs),
-
-        rows  : rs.length
-
-      };
-
-    });
-
-  const prod =
-    [...stats]
-      .sort((a,b)=>b.total-a.total);
-
-  const dead =
-    [...stats]
-      .sort((a,b)=>b.down-a.down);
-
-  const totalDown =
-    stats.reduce(
-      (a,x)=>a+x.down,
-      0
-    );
-
-  function footer(){
-
-    pdf.setDrawColor(220);
-
-    pdf.line(
-      10,
-      198,
-      287,
-      198
-    );
-
-    pdf.setFontSize(7);
-
-    pdf.setTextColor(110);
-
-    pdf.text(
-      'JV International Solutions Inc.',
-      10,
-      203
-    );
-
-    pdf.text(
-      new Date().toLocaleString('es-MX'),
-      230,
-      203
-    );
-
-  }
-
-  function header(title,page,total){
-
-    pdf.setTextColor(...INK);
-
-    pdf.setFontSize(18);
-
-    pdf.setFont(
-      'helvetica',
-      'bold'
-    );
-
-    pdf.text(
-      'JV INTERNATIONAL',
-      12,
-      14
-    );
-
-    pdf.setFontSize(8);
-
-    pdf.text(
-      'SOLUTIONS INC.',
-      12,
-      19
-    );
-
-    pdf.setFontSize(16);
-
-    pdf.text(
-      title,
-      12,
-      31
-    );
-
-    pdf.setFontSize(8);
-
-    pdf.text(
-      'Período: ' + period,
-      12,
-      37
-    );
-
-    pdf.text(
-      `Página ${page} de ${total}`,
-      255,
-      12
-    );
-
-  }
-
-  function card(
-    x,
-    y,
-    w,
-    title,
-    value,
-    subtitle=''
-  ){
-
-    pdf.setFillColor(
-      247,
-      250,
-      249
-    );
-
-    pdf.setDrawColor(
-      ...GREEN
-    );
-
-    pdf.roundedRect(
-      x,
-      y,
-      w,
-      24,
-      2,
-      2,
-      'FD'
-    );
-
-    pdf.setFontSize(7);
-
-    pdf.setTextColor(90);
-
-    pdf.text(
-      title.toUpperCase(),
-      x+4,
-      y+6
-    );
-
-    pdf.setTextColor(
-      ...INK
-    );
-
-    pdf.setFont(
-      'helvetica',
-      'bold'
-    );
-
-    pdf.setFontSize(13);
-
-    pdf.text(
-      String(value),
-      x+4,
-      y+15
-    );
-
-    pdf.setFont(
-      'helvetica',
-      'normal'
-    );
-
-    pdf.setFontSize(7);
-
-    pdf.text(
-      String(subtitle),
-      x+4,
-      y+21
-    );
-
-  }
-
-  function bars(
-    title,
-    list,
-    x,
-    y,
-    w,
-    h,
-    timeMode=false
-  ){
-
-    pdf.setTextColor(
-      ...INK
-    );
-
-    pdf.setFont(
-      'helvetica',
-      'bold'
-    );
-
-    pdf.setFontSize(10);
-
-    pdf.text(
-      title,
-      x,
-      y
-    );
-
-    let max =
-      list[0]?.[1] || 1;
-
-    list
-      .slice(0,8)
-      .forEach((row,i)=>{
-
-        const yy =
-          y+10+i*10;
-
-        pdf.setFontSize(7);
-
-        pdf.setFont(
-          'helvetica',
-          'normal'
-        );
-
-        pdf.text(
-          row[0],
-          x,
-          yy
-        );
-
-        pdf.setFillColor(
-          230,
-          237,
-          235
-        );
-
-        pdf.rect(
-          x+42,
-          yy-3,
-          w-75,
-          3,
-          'F'
-        );
-
-        pdf.setFillColor(
-          ...GREEN
-        );
-
-        pdf.rect(
-          x+42,
-          yy-3,
-          ((w-75)*row[1])/max,
-          3,
-          'F'
-        );
-
-        pdf.text(
-          timeMode
-            ? time(row[1])
-            : fmt(row[1]),
-          x+w-28,
-          yy
-        );
-
-      });
-
-  }
-
-  /* --------------------------------
-     PAGINA 1
-  -------------------------------- */
-
-  header(
-    'Informe General de Producción',
-    1,
-    2
-  );
-
-  card(
-    10,
-    45,
-    65,
-    'Mayor producción',
-    fmt(prod[0]?.total || 0),
-    prod[0]?.area || ''
-  );
-
-  card(
-    80,
-    45,
-    65,
-    'Tiempo muerto total',
-    time(totalDown)
-  );
-
-  card(
-    150,
-    45,
-    65,
-    'Mayor tiempo muerto',
-    time(dead[0]?.down || 0),
-    dead[0]?.area || ''
-  );
-
-  card(
-    220,
-    45,
-    65,
-    'Áreas activas',
-    stats.filter(
-      x=>x.rows
-    ).length
-  );
-
-  bars(
-    'Producción total por área',
-    prod.map(
-      x=>[
-        x.area,
-        x.total
-      ]
-    ),
-    10,
-    85,
-    276,
-    60
-  );
-
-  bars(
-    'Tiempo muerto por área',
-    dead.map(
-      x=>[
-        x.area,
-        x.down
-      ]
-    ),
-    10,
-    150,
-    276,
-    40,
-    true
-  );
-
-  footer();
-
-  /* --------------------------------
-     PAGINA 2
-  -------------------------------- */
-
-  pdf.addPage();
-
-  header(
-    'Informe General de Producción',
-    2,
-    2
-  );
-
-  let all =
-    DEPTS.flatMap(
-      d=>rows(d)
-    );
-
-  let motivos =
-    downGroup(
-      all,
-      'MOTIVO'
-    );
-
-  let maquinas =
-    downGroup(
-      all,
-      'NO. MAQUINA'
-    );
-
-  bars(
-    'Principales motivos de tiempo muerto',
-    motivos,
-    10,
-    50,
-    133,
-    100,
-    true
-  );
-
-  bars(
-    'Máquinas con mayor incidencia',
-    maquinas,
-    150,
-    50,
-    133,
-    100,
-    true
-  );
-
-  let lav =
-    rows('Lavanderia');
-
-  const totalKg =
-    sum(
-      lav,
-      'TOTAL KGS'
-    );
-
-  let lienzos=0;
-  let prendas=0;
-
-  lav.forEach(r=>{
-
-    let kg =
-      num(
-        r['TOTAL KGS']
-      );
-
-    if(
-      laundryType(r)
-      === 'Lienzos'
-    ){
-      lienzos += kg;
-    }else{
-      prendas += kg;
-    }
-
-  });
-
-  card(
-    10,
-    160,
-    60,
-    'Total KG',
-    fmt(totalKg)
-  );
-
-  card(
-    75,
-    160,
-    60,
-    'Lienzos',
-    fmt(lienzos),
-    totalKg
-      ? ((lienzos/totalKg)*100)
-          .toFixed(1)+'%'
-      : '0%'
-  );
-
-  card(
-    140,
-    160,
-    60,
-    'Prendas',
-    fmt(prendas),
-    totalKg
-      ? ((prendas/totalKg)*100)
-          .toFixed(1)+'%'
-      : '0%'
-  );
-
-  pdf.setFontSize(9);
-
-  pdf.setTextColor(
-    ...INK
-  );
-
-  pdf.text(
-    `Mayor volumen procesado: ${prod[0]?.area} registró ${fmt(prod[0]?.total)} piezas durante el período.`,
-    210,
-    170,
-    {
-      maxWidth:70
-    }
-  );
-
-  pdf.text(
-    `Tiempo muerto total: ${time(totalDown)}.`,
-    210,
-    182,
-    {
-      maxWidth:70
-    }
-  );
-
-  footer();
-
-  pdf.save(
-    `Informe_Produccion_General_${PERIOD}.pdf`
-  );
-
+/* ===================================================================
+   MOTOR COMPARTIDO DE REPORTES PDF
+   Usado tanto por pdfGeneral() como por pdfArea(d) para que ambos
+   reportes tengan exactamente el mismo diseño corporativo.
+   =================================================================== */
+let LOGO_IMG = null;
+(function preloadLogo(){
+  const img = new Image();
+  img.onload = () => { LOGO_IMG = img; };
+  img.src = 'Logo_JV International.png';
+})();
+
+function hexToRgb(hex){
+  hex = String(hex || '#08776b').replace('#', '');
+  if(hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const num = parseInt(hex, 16);
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
 }
+
+const PDF_W = 297, PDF_H = 210, PDF_MARGIN = 8, PDF_BAND_H = 32;
+const PDF_CONTENT_TOP = 40, PDF_FOOTER_LINE_Y = 200, PDF_FOOTER_TEXT_Y = 205;
+const PDF_BREAK_Y = 196;
+const PDF_COL_W = (PDF_W - 2*PDF_MARGIN - 6) / 2;
+const PDF_COL2_X = PDF_MARGIN + PDF_COL_W + 6;
+const C_INK = [15, 61, 54], C_GREEN = [15, 110, 99], C_MUTED = [104, 120, 115],
+      C_LINE = [223, 232, 229], C_BG = [247, 250, 249], C_ALERT = [192, 57, 43],
+      C_TRACK = [230, 237, 233];
+
+function pdfTruncate(pdf, text, maxW){
+  text = String(text ?? '');
+  if(pdf.getTextWidth(text) <= maxW) return text;
+  while(text.length > 1 && pdf.getTextWidth(text + '\u2026') > maxW){
+    text = text.slice(0, -1);
+  }
+  return text + '\u2026';
+}
+
+function pdfHeader(pdf, title, period){
+  pdf.setFillColor(...C_INK);
+  pdf.rect(0, 0, PDF_W, PDF_BAND_H, 'F');
+
+  const badgeX = 8, badgeW = 54, badgeH = badgeW / 4.407;
+  const badgeY = (PDF_BAND_H - badgeH) / 2;
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(badgeX, badgeY, badgeW, badgeH, 1.5, 1.5, 'F');
+  if(LOGO_IMG){
+    const pad = 1.4;
+    try{ pdf.addImage(LOGO_IMG, 'PNG', badgeX+pad, badgeY+pad, badgeW-2*pad, badgeH-2*pad); }
+    catch(e){ /* el logo aún no cargó a tiempo; se omite sin romper el PDF */ }
+  }
+
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(15);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(title, badgeX + badgeW + 8, PDF_BAND_H/2 + 2);
+
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9.5);
+  pdf.text('Per\u00edodo: ' + period, PDF_W - 8, 13, {align: 'right'});
+
+  pdf._pdfPageNumSlots = pdf._pdfPageNumSlots || [];
+  pdf._pdfPageNumSlots.push({page: pdf.internal.getNumberOfPages(), where: 'header', x: PDF_W-8, y: 19});
+}
+
+function pdfFooter(pdf){
+  pdf.setDrawColor(...C_LINE);
+  pdf.line(PDF_MARGIN, PDF_FOOTER_LINE_Y, PDF_W-PDF_MARGIN, PDF_FOOTER_LINE_Y);
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.6);
+  pdf.setTextColor(...C_MUTED);
+  pdf.text('JV International Solutions Inc.  \u00b7  Generado: ' + new Date().toLocaleString('es-MX'),
+    PDF_MARGIN, PDF_FOOTER_TEXT_Y);
+  pdf._pdfPageNumSlots.push({page: pdf.internal.getNumberOfPages(), where: 'footer', x: PDF_W-PDF_MARGIN, y: PDF_FOOTER_TEXT_Y});
+}
+
+function pdfFinalizePageNumbers(pdf){
+  const total = pdf.internal.getNumberOfPages();
+  (pdf._pdfPageNumSlots || []).forEach(slot => {
+    pdf.setPage(slot.page);
+    if(slot.where === 'header'){
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8.5);
+      pdf.setTextColor(207, 227, 221);
+    } else {
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.6);
+      pdf.setTextColor(...C_MUTED);
+    }
+    pdf.text(`P\u00e1gina ${slot.page} de ${total}`, slot.x, slot.y, {align: 'right'});
+  });
+}
+
+function pdfKpiCard(pdf, x, y, w, h, label, value, sub){
+  pdf.setFillColor(...C_BG); pdf.setDrawColor(...C_LINE);
+  pdf.roundedRect(x, y, w, h, 2, 2, 'FD');
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.6);
+  pdf.setTextColor(...C_MUTED);
+  pdf.text(pdfTruncate(pdf, String(label).toUpperCase(), w-8), x+4, y+7);
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(15);
+  pdf.setTextColor(...C_INK);
+  pdf.text(pdfTruncate(pdf, String(value), w-8), x+4, y+h*0.62);
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.6);
+  pdf.setTextColor(...C_MUTED);
+  pdf.text(pdfTruncate(pdf, String(sub || ''), w-8), x+4, y+h-4);
+}
+
+/** Barras horizontales planas y compactas (etiqueta · barra · valor), el
+ * mismo lenguaje visual ya usado en el informe general. Devuelve la
+ * coordenada Y inferior para poder encadenar la siguiente sección. */
+function pdfFlatBars(pdf, x, y, w, title, items, colorFn, valueFmt, labelW, rowH){
+  rowH = rowH || 8;
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10.5);
+  pdf.setTextColor(...C_INK);
+  pdf.text(title, x, y);
+  const top = y + 7;
+
+  if(!items || !items.length){
+    pdf.setFont('helvetica', 'italic'); pdf.setFontSize(8);
+    pdf.setTextColor(...C_MUTED);
+    pdf.text('Sin datos en el per\u00edodo seleccionado.', x, top + 2);
+    return top + 8;
+  }
+
+  const maxVal = Math.max(1, ...items.map(it => it[1]));
+  const barX0 = x + labelW;
+  const barW = w - labelW - 30;
+  items.forEach((it, i) => {
+    const yy = top + i*rowH;
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8.3);
+    pdf.setTextColor(...C_INK);
+    pdf.text(pdfTruncate(pdf, it[0], labelW-2), x, yy);
+    pdf.setFillColor(...C_TRACK);
+    pdf.roundedRect(barX0, yy-3, barW, 3, 1, 1, 'F');
+    const fw = Math.max(0.8, barW * (it[1] / maxVal));
+    pdf.setFillColor(...colorFn(it[0]));
+    pdf.roundedRect(barX0, yy-3, fw, 3, 1, 1, 'F');
+    pdf.setFontSize(8);
+    pdf.text(valueFmt(it[1]), barX0 + barW + 3, yy);
+  });
+  return top + items.length*rowH;
+}
+
+function pdfInsightCard(pdf, x, y, w, h, num, title, text){
+  pdf.setFillColor(238, 246, 234); pdf.setDrawColor(214, 232, 202);
+  pdf.roundedRect(x, y, w, h, 2, 2, 'FD');
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(9);
+  pdf.setTextColor(...C_GREEN);
+  pdf.text(`${num}.`, x+4, y+7);
+  pdf.text(title, x+10, y+7);
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.7);
+  pdf.setTextColor(46, 72, 66);
+  const lines = pdf.splitTextToSize(text, w-8);
+  pdf.text(lines, x+4, y+13);
+}
+
+/* ===================================================================
+   REPORTE POR ÁREA — usa el mismo motor visual que el informe general,
+   con paginación dinámica: si un área tiene muchos grupos de detalle,
+   agrega páginas adicionales en vez de recortar información.
+   =================================================================== */
+function pdfArea(d){
+  if(!window.jspdf){ alert('No se pudo cargar jsPDF'); return; }
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+  pdf._pdfPageNumSlots = [];
+
+  const c = CFG[d], st = state(d), r = filtered(d);
+  const [from, to] = range();
+  const period = `${dateFmt(from)} - ${dateFmt(to)}`;
+  const total = sum(r, c.value), down = downtime(r);
+  const areaTitle = d === 'Lavanderia' ? 'Lavander\u00eda' : c.title;
+
+  const fourth = d === 'Ejemplos' ? ['Tiendas', unique(r,'TIENDA')]
+    : d === 'Neck' ? ['M\u00e1quinas activas', unique(r,'NO. MAQUINA')]
+    : d === 'Cuadros' ? ['Departamentos', unique(r,'DEPT')]
+    : [c.down ? 'Tiempo muerto' : 'D\u00edas con actividad', c.down ? time(down) : unique(r,'FECHA')];
+  const second = d === 'Lavanderia' ? ['Total KGS', sum(r,'TOTAL KGS')]
+    : d === 'Cuadros' ? ['Procesos', unique(r,'PROCESO')]
+    : d === 'Ejemplos' ? ['Clientes', unique(r,'CLIENTE')]
+    : ['WO contabilizadas', unique(r,'NO. WO')];
+
+  const areaColor = () => hexToRgb(c.accent);
+  const title = `Informe de Producci\u00f3n: ${areaTitle}`;
+
+  pdfHeader(pdf, title, period);
+
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8.4);
+  pdf.setTextColor(...C_MUTED);
+  const filtroTxt = (st.key && st.val)
+    ? `Filtro aplicado: ${LABEL[st.key] || st.key} = ${st.val === '__EMPTY__' ? (EMPTY[st.key] || 'Sin informaci\u00f3n') : st.val}`
+    : 'Filtro aplicado: ninguno (todas las categor\u00edas)';
+  pdf.text(filtroTxt, PDF_MARGIN, PDF_CONTENT_TOP - 4);
+
+  const kw = (PDF_W - 2*PDF_MARGIN - 3*4) / 4, kh = 24, ky = PDF_CONTENT_TOP;
+  pdfKpiCard(pdf, PDF_MARGIN+0*(kw+4), ky, kw, kh, c.metric, fmt(total), '');
+  pdfKpiCard(pdf, PDF_MARGIN+1*(kw+4), ky, kw, kh, second[0], typeof second[1]==='string'?second[1]:fmt(second[1]), '');
+  pdfKpiCard(pdf, PDF_MARGIN+2*(kw+4), ky, kw, kh, 'Registros del per\u00edodo', fmt(r.length), '');
+  pdfKpiCard(pdf, PDF_MARGIN+3*(kw+4), ky, kw, kh, fourth[0], typeof fourth[1]==='string'?fourth[1]:fmt(fourth[1]), '');
+
+  let cursorY = ky + kh + 10;
+  function ensureSpace(neededH){
+    if(cursorY + neededH > PDF_BREAK_Y){
+      pdfFooter(pdf);
+      pdf.addPage();
+      pdfHeader(pdf, title, period);
+      cursorY = PDF_CONTENT_TOP;
+    }
+  }
+
+  const groups = c.groups || [];
+  for(let i = 0; i < groups.length; i += 2){
+    const k1 = groups[i], k2 = groups[i+1];
+    const items1 = group(r, k1, c.value).slice(0, 10);
+    const items2 = k2 ? group(r, k2, c.value).slice(0, 10) : [];
+    const rowH = 8;
+    ensureSpace(9 + Math.max(items1.length, items2.length, 1)*rowH);
+    const b1 = pdfFlatBars(pdf, PDF_MARGIN, cursorY, PDF_COL_W, `Detalle por ${LABEL[k1]||k1}`,
+      items1, areaColor, v => fmt(v), 30, rowH);
+    let b2 = b1;
+    if(k2){
+      b2 = pdfFlatBars(pdf, PDF_COL2_X, cursorY, PDF_COL_W, `Detalle por ${LABEL[k2]||k2}`,
+        items2, areaColor, v => fmt(v), 30, rowH);
+    }
+    cursorY = Math.max(b1, b2) + 10;
+  }
+
+  if(c.down){
+    const motivos = downGroup(r, 'MOTIVO').slice(0, 8);
+    const maquinas = downGroup(r, 'NO. MAQUINA').slice(0, 8);
+    const rowH = 8;
+    ensureSpace(9 + Math.max(motivos.length, maquinas.length, 1)*rowH);
+    const totMot = motivos.reduce((s,x)=>s+x[1],0);
+    const totMaq = maquinas.reduce((s,x)=>s+x[1],0);
+    const b1 = pdfFlatBars(pdf, PDF_MARGIN, cursorY, PDF_COL_W, 'Tiempo muerto por motivo',
+      motivos, () => C_ALERT, v => `${time(v)} (${totMot?(v/totMot*100).toFixed(1):0}%)`, 38, rowH);
+    const b2 = pdfFlatBars(pdf, PDF_COL2_X, cursorY, PDF_COL_W, 'Tiempo muerto por m\u00e1quina',
+      maquinas.map(x => [`M\u00e1quina ${x[0]}`, x[1]]), () => C_ALERT,
+      v => `${time(v)} (${totMaq?(v/totMaq*100).toFixed(1):0}%)`, 26, rowH);
+    cursorY = Math.max(b1, b2) + 10;
+  }
+
+  pdfFooter(pdf);
+  pdfFinalizePageNumbers(pdf);
+  const slug = areaTitle.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'');
+  pdf.save(`JVInternational_Informe-${slug}_Generado-${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+/* ===================================================================
+   REPORTE GENERAL — mismo motor visual, con los datos agregados de
+   todas las áreas.
+   =================================================================== */
+function pdfGeneral(){
+  if(!window.jspdf){ alert('No se pudo cargar jsPDF'); return; }
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+  pdf._pdfPageNumSlots = [];
+
+  const [from, to] = range();
+  const period = `${dateFmt(from)} - ${dateFmt(to)}`;
+
+  const stats = DEPTS.map(d => {
+    const rs = rows(d), c = CFG[d];
+    return {area: c.title, key: d,
+             accent: c.accent, total: sum(rs, c.value), down: downtime(rs), rows: rs.length};
+  });
+  const prod = [...stats].sort((a,b) => b.total - a.total);
+  const dead = [...stats].sort((a,b) => b.down - a.down);
+  const totalDown = stats.reduce((a,x) => a+x.down, 0);
+  const grandTotal = stats.reduce((a,x) => a+x.total, 0);
+  const colorByArea = {}; stats.forEach(x => colorByArea[x.area] = hexToRgb(x.accent));
+  const areaColor = name => colorByArea[name] || [8, 119, 107];
+
+  pdfHeader(pdf, 'Informe General de Producci\u00f3n', period);
+
+  const kw = (PDF_W - 2*PDF_MARGIN - 3*4) / 4, kh = 24, ky = PDF_CONTENT_TOP;
+  pdfKpiCard(pdf, PDF_MARGIN+0*(kw+4), ky, kw, kh, 'Mayor producci\u00f3n', fmt(prod[0]?.total||0), prod[0]?.area||'');
+  pdfKpiCard(pdf, PDF_MARGIN+1*(kw+4), ky, kw, kh, 'Tiempo muerto total', time(totalDown), '');
+  pdfKpiCard(pdf, PDF_MARGIN+2*(kw+4), ky, kw, kh, 'Mayor tiempo muerto', time(dead[0]?.down||0), dead[0]?.area||'');
+  pdfKpiCard(pdf, PDF_MARGIN+3*(kw+4), ky, kw, kh, '\u00c1reas activas', String(stats.filter(x=>x.rows).length), 'Con registros');
+
+  const chartY = ky + kh + 10;
+  const b1 = pdfFlatBars(pdf, PDF_MARGIN, chartY, PDF_COL_W, 'Producci\u00f3n total por \u00e1rea (piezas)',
+    prod.map(x => [x.area, x.total]), areaColor, v => fmt(v), 24);
+  const b2 = pdfFlatBars(pdf, PDF_COL2_X, chartY, PDF_COL_W, 'Tiempo muerto por \u00e1rea',
+    dead.map(x => [x.area, x.down]), () => C_ALERT, v => time(v), 24);
+
+  const lav = rows('Lavanderia');
+  const totalKg = sum(lav, 'TOTAL KGS');
+  let lienzos = 0, prendas = 0;
+  lav.forEach(r => { const kg = num(r['TOTAL KGS']); if(laundryType(r)==='Lienzos') lienzos += kg; else prendas += kg; });
+  const lavY = Math.max(b1, b2) + 10;
+  pdfFlatBars(pdf, PDF_MARGIN, lavY, PDF_COL_W, 'Resumen de lavander\u00eda (kilos)',
+    [['Prendas', prendas], ['Lienzos', lienzos]],
+    n => n === 'Prendas' ? [143, 191, 134] : [63, 125, 58],
+    v => `${fmt(v)} kg (${totalKg ? (v/totalKg*100).toFixed(1) : 0}%)`, 22);
+
+  pdfFooter(pdf);
+
+  // ---- página 2 ----
+  pdf.addPage();
+  pdfHeader(pdf, 'Informe General de Producci\u00f3n', period);
+
+  const all = DEPTS.flatMap(d => rows(d));
+  const motivosAll = downGroup(all, 'MOTIVO');
+  const maquinasAll = downGroup(all, 'NO. MAQUINA');
+  const motivos = motivosAll.slice(0, 8);
+  const maquinas = maquinasAll.slice(0, 8);
+  const totMot = motivos.reduce((s,x)=>s+x[1], 0);
+  const totMaq = maquinas.reduce((s,x)=>s+x[1], 0);
+
+  const p2y = PDF_CONTENT_TOP;
+  const mTitle = 'Principales motivos de tiempo muerto' + (motivosAll.length>8 ? ' (top 8)' : '');
+  const maTitle = 'M\u00e1quinas con mayor incidencia' + (maquinasAll.length>8 ? ' (top 8)' : '');
+  const m1 = pdfFlatBars(pdf, PDF_MARGIN, p2y, PDF_COL_W, mTitle,
+    motivos, () => C_ALERT, v => `${time(v)} (${totMot?(v/totMot*100).toFixed(1):0}%)`, 40);
+  const m2 = pdfFlatBars(pdf, PDF_COL2_X, p2y, PDF_COL_W, maTitle,
+    maquinas.map(x => [`M\u00e1quina ${x[0]}`, x[1]]), () => C_ALERT,
+    v => `${time(v)} (${totMaq?(v/totMaq*100).toFixed(1):0}%)`, 26);
+
+  const pkY = Math.max(m1, m2) + 10;
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(11);
+  pdf.setTextColor(...C_INK);
+  pdf.text('Puntos clave del per\u00edodo', PDF_MARGIN, pkY);
+
+  const iw = (PDF_W - 2*PDF_MARGIN - 2*4) / 3, ih = 42, iy = pkY + 6;
+  const pct1 = grandTotal ? (prod[0]?.total/grandTotal*100).toFixed(1) : '0';
+  const pct3 = totMot ? (motivos[0]?.[1]/totMot*100).toFixed(1) : '0';
+  pdfInsightCard(pdf, PDF_MARGIN+0*(iw+4), iy, iw, ih, 1, 'Mayor producci\u00f3n',
+    `${prod[0]?.area||'—'} concentra el ${pct1}% del total de piezas producidas en el per\u00edodo.`);
+  pdfInsightCard(pdf, PDF_MARGIN+1*(iw+4), iy, iw, ih, 2, 'Tiempo muerto',
+    `Se registraron ${time(totalDown)} de tiempo muerto en total durante el per\u00edodo.`);
+  pdfInsightCard(pdf, PDF_MARGIN+2*(iw+4), iy, iw, ih, 3, 'Mayor incidencia',
+    `El motivo principal fue ${motivos[0]?.[0]||'—'}, con ${pct3}% del tiempo muerto registrado.`);
+
+  pdfFooter(pdf);
+  pdfFinalizePageNumbers(pdf);
+  pdf.save(`JVInternational_InformeGeneral_Generado-${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
 fetch('data.json?v='+Date.now())
 .then(r=>r.json())
 .then(j=>{
