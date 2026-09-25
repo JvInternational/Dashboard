@@ -270,7 +270,99 @@ function state(d){if(!STATE[d]){let [a,b]=range();STATE[d]={a,b,key:'',val:''}}r
 function filtered(d){let st=state(d);return (DATA[d]||[]).filter(r=>{let k=dateKey(r.FECHA),ok=k>=st.a&&k<=st.b;if(st.key&&st.val)ok=ok&&(st.val==='__EMPTY__'?empty(r[st.key]):String(r[st.key])===st.val);return ok})}
 function filterUI(d){let c=CFG[d],st=state(d),base=DATA[d]||[],vals=st.key?[...new Set(base.filter(r=>!empty(r[st.key])).map(r=>String(r[st.key])))].sort():[],has=st.key&&base.some(r=>empty(r[st.key]));return `<div class="panel filters"><div class="field"><label>Desde</label><input type="date" value="${st.a}" onchange="STATE['${d}'].a=this.value;area('${d}')"></div><div class="field"><label>Hasta</label><input type="date" value="${st.b}" onchange="STATE['${d}'].b=this.value;area('${d}')"></div><div class="field"><label>Filtrar por</label><select onchange="STATE['${d}'].key=this.value;STATE['${d}'].val='';area('${d}')"><option value="">Sin filtro adicional</option>${c.groups.map(k=>`<option value="${k}" ${st.key===k?'selected':''}>${LABEL[k]}</option>`).join('')}</select></div><div class="field"><label>Selección</label><select ${st.key?'':'disabled'} onchange="STATE['${d}'].val=this.value;area('${d}')"><option value="">Todos</option>${vals.map(v=>`<option ${st.val===v?'selected':''}>${esc(v)}</option>`).join('')}${has?`<option value="__EMPTY__" ${st.val==='__EMPTY__'?'selected':''}>${EMPTY[st.key]}</option>`:''}</select></div><button class="btn" onclick="delete STATE['${d}'];area('${d}')">Restablecer</button><button class="btn" onclick="pdfArea('${d}')">Exportar PDF</button></div>`}
 function unique(rs,k){return new Set(rs.map(r=>r[k]).filter(v=>!empty(v))).size}
-function trend(rs,key,id,color){let m={};rs.forEach(r=>{let k=dateKey(r.FECHA);m[k]=(m[k]||0)+num(r[key])});if(CHART)CHART.destroy();let el=document.querySelector('#'+id),a=Object.entries(m).sort();if(!a.length)return;CHART=new Chart(el,{type:'line',data:{labels:a.map(x=>dateFmt(x[0])),datasets:[{data:a.map(x=>x[1]),borderColor:color,backgroundColor:color+'20',fill:true,tension:.3}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}
+function trend(
+  rs,
+  key,
+  id,
+  color
+){
+
+  let m = {};
+
+  rs.forEach(r => {
+
+    let k =
+      dateKey(r.FECHA);
+
+    m[k] =
+      (m[k] || 0)
+      + num(r[key]);
+
+  });
+
+  let a =
+    Object
+      .entries(m)
+      .sort();
+
+  if(CHART)
+    CHART.destroy();
+
+  let el =
+    document.getElementById(id);
+
+  if(!el){
+    console.warn(
+      'Canvas no encontrado:',
+      id
+    );
+    return;
+  }
+
+  if(!a.length){
+    return;
+  }
+
+  CHART =
+    new Chart(
+      el.getContext('2d'),
+      {
+        type:'line',
+
+        data:{
+          labels:a.map(
+            x => dateFmt(x[0])
+          ),
+
+          datasets:[
+            {
+              data:a.map(
+                x => x[1]
+              ),
+
+              borderColor:color,
+
+              backgroundColor:
+                color + '20',
+
+              fill:true,
+
+              tension:.3
+            }
+          ]
+        },
+
+        options:{
+          responsive:true,
+
+          maintainAspectRatio:false,
+
+          plugins:{
+            legend:{
+              display:false
+            }
+          },
+
+          scales:{
+            y:{
+              beginAtZero:true
+            }
+          }
+        }
+      }
+    );
+
+}
 function kpi(l,v,a){return `<div class="kpi" style="--accent:${a}"><div class="klabel">${l}</div><div class="value">${typeof v==='string'?v:fmt(v)}</div></div>`}
 function table(d,rs){let cols=Object.keys(DATA[d]?.[0]||{}).filter(k=>k&&k!=='Visible'&&k!=='Registro visible').slice(0,16);if(d==='Lavanderia'){cols=cols.filter(x=>x!=='DURACIÓN');let i=cols.indexOf('HORA DE TERMINADO');cols.splice(i+1,0,'DURACIÓN')}let head=k=>k==='HORA DE COMIENZO'?'Hora inicio':k==='HORA DE TERMINADO'?'Hora fin':k==='DURACIÓN'?'Duración':/NOTAS?/i.test(k)?'Comentarios':k;return `<div class="tableWrap"><table class="table"><thead><tr>${cols.map(k=>`<th>${head(k)}</th>`).join('')}</tr></thead><tbody>${rs.map(r=>`<tr>${cols.map(k=>{let v=k==='DURACIÓN'?duration(r['HORA DE COMIENZO'],r['HORA DE TERMINADO']):r[k];if(k==='FECHA')v=dateFmt(v);if(/HORA DE (COMIENZO|TERMINADO)/.test(k))v=hour(v);let n=typeof v==='number'&&!IDS.has(k);return `<td class="${n?'num':''}">${n?fmt(v):esc(v)}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`}
 function hour(v){let m=String(v||'').match(/(?:T|^)(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:'—'}function duration(a,b){a=hour(a);b=hour(b);if(a==='—'||b==='—')return '—';let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),z=x*60+y-h*60-m;if(z<0)z+=1440;return `${Math.floor(z/60)?Math.floor(z/60)+'h ':''}${z%60}m`}
