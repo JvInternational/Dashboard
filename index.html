@@ -5,7 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root{--bg:#f3f6f5;--card:#fff;--ink:#173b35;--muted:#687873;--line:#dfe8e5;--side:#101a20;--green:#08776b;--lime:#b8da45;--shadow:0 5px 18px #153b3220;--r:13px}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#192622;font-family:Inter,Segoe UI,Arial,sans-serif}.app{display:flex;min-height:100vh}.side{width:230px;background:var(--side);padding:18px 14px;color:#dce6e3;position:sticky;top:0;height:100vh}.logoBox{height:75px;background:#fff;border-radius:7px;padding:7px;display:flex;align-items:center}.logoBox img{width:100%;height:100%;object-fit:contain}.sideLabel{font-size:9px;letter-spacing:1.2px;color:#83938e;margin:13px 7px 7px}.nav{display:grid;gap:3px}.nav button{border:0;background:none;color:#c9d2d0;text-align:left;padding:10px;border-radius:8px;cursor:pointer}.nav button.active,.nav button:hover{background:#21342f;color:#fff}.main{width:calc(100% - 230px);max-width:1450px;padding:25px 28px 60px}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:17px}.title{font-size:27px;margin:0;color:#132b27}.desc{font-size:13px;color:var(--muted);margin-top:3px}.tools{display:flex;gap:9px;align-items:end}.field{display:grid;gap:4px}.field label,.klabel{font-size:10px;color:#71807c;text-transform:uppercase;letter-spacing:.35px}.field select,.field input{height:36px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:0 10px}.periodInfo{font-size:11px;color:#667570}.periodInfo b{display:block;color:#2e4842}.btn{height:36px;border:0;border-radius:7px;padding:0 14px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}.panel,.card,.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panel{padding:16px;margin-bottom:15px}.sectionTitle{font-size:14px;margin:0 0 13px}.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.area{padding:15px;border-left:4px solid var(--accent);cursor:pointer}.area b{font-size:10px}.area .value{font:700 24px ui-monospace,Consolas;margin:9px 0}.note{font-size:11px;color:var(--muted)}.executive{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:15px}.exec{padding:15px;border-top:3px solid var(--green)}.exec .value{font:700 22px ui-monospace,Consolas;margin:8px 0 3px;line-height:1.15}.exec small{color:var(--muted)}.charts{display:grid;gap:15px}.bars{display:grid;gap:10px}.bar{display:grid;grid-template-columns:150px 190px 1fr;align-items:center;gap:10px;font-size:12px}.bar .val{font:600 12px ui-monospace,Consolas}.track{height:7px;background:#e8efed;border-radius:10px;overflow:hidden}.fill{height:100%;border-radius:10px}.machineGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.machine{padding:14px;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px}.machine strong{font-size:16px}.machine .total{font:600 13px ui-monospace,Consolas;margin:6px 0}.machine .reason{font-size:12px;color:var(--muted)}.machine .reason b{display:block;color:#263b36;margin-top:3px}.filters{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;align-items:end}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:15px 0}.kpi{padding:15px;border-left:4px solid var(--accent)}.kpi .value{font:700 24px ui-monospace,Consolas;margin-top:8px}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.chart{height:280px}.tableWrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:9px}.table{border-collapse:collapse;width:100%;font-size:12px}.table th{position:sticky;top:0;background:#f5f8f7;padding:9px;text-align:left;white-space:nowrap}.table td{padding:8px 9px;border-top:1px solid #edf1f0;white-space:nowrap}.table td.num{text-align:right;font:600 12px ui-monospace,Consolas}.legend{font-size:12px;margin-bottom:10px}.sw{display:inline-block;width:9px;height:9px;margin:0 5px 0 13px}.empty{padding:30px;text-align:center;color:var(--muted)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#192622;font-family:Inter,Segoe UI,Arial,sans-serif}.app{display:flex;min-height:100vh}.side{width:230px;background:var(--side);padding:18px 14px;color:#dce6e3;position:sticky;top:0;height:100vh}.logoBox{height:75px;background:#fff;border-radius:7px;padding:7px;display:flex;align-items:center}.logoBox img{width:100%;height:100%;object-fit:contain}.sideLabel{font-size:9px;letter-spacing:1.2px;color:#83938e;margin:13px 7px 7px}.nav{display:grid;gap:3px}.nav button{border:0;background:none;color:#c9d2d0;text-align:left;padding:10px;border-radius:8px;cursor:pointer}.nav button.active,.nav button:hover{background:#21342f;color:#fff}.main{width:calc(100% - 230px);max-width:1450px;padding:25px 28px 60px}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:17px}.title{font-size:27px;margin:0;color:#132b27}.desc{font-size:13px;color:var(--muted);margin-top:3px}.tools{display:flex;gap:9px;align-items:end}.field{display:grid;gap:4px}.field label,.klabel{font-size:10px;color:#71807c;text-transform:uppercase;letter-spacing:.35px}.field select,.field input{height:36px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:0 10px}.periodInfo{font-size:11px;color:#667570}.periodInfo b{display:block;color:#2e4842}.btn{height:36px;border:0;border-radius:7px;padding:0 14px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}.panel,.card,.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panel{padding:16px;margin-bottom:15px}.sectionTitle{font-size:14px;margin:0 0 13px}.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.area{padding:15px;border-left:4px solid var(--accent);cursor:pointer}.area b{font-size:10px}.area .value{font:700 24px ui-monospace,Consolas;margin:9px 0}.note{font-size:11px;color:var(--muted)}.executive{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:15px}.exec{padding:15px;border-top:3px solid var(--green)}.exec .value{font:700 22px ui-monospace,Consolas;margin:8px 0 3px;line-height:1.15}.exec small{color:var(--muted)}.charts{display:grid;gap:15px}.bars{display:grid;gap:10px}.bar{display:grid;grid-template-columns:150px 190px 1fr;align-items:center;gap:10px;font-size:12px}.bar .val{font:600 12px ui-monospace,Consolas}.track{height:7px;background:#e8efed;border-radius:10px;overflow:hidden}.fill{height:100%;border-radius:10px}.machineGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.machine{padding:14px;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px}.machine strong{font-size:16px}.machine .total{font:600 13px ui-monospace,Consolas;margin:6px 0}.machine .reason{font-size:12px;color:var(--muted)}.machine .reason b{display:block;color:#263b36;margin-top:3px}.machine .mHead{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid var(--line)}.machine .mHead .total{margin:0;font-weight:700}.machine .breakdownLabel{font-size:9px;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}.machine .breakdownRow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:11px;margin:6px 0}.machine .breakdownRow .track{height:5px}.machine .breakdownRow .bval{font:700 10.5px ui-monospace,Consolas;white-space:nowrap}.filters{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;align-items:end}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:15px 0}.kpi{padding:15px;border-left:4px solid var(--accent)}.kpi .value{font:700 24px ui-monospace,Consolas;margin-top:8px}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.chart{height:280px}.tableWrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:9px}.table{border-collapse:collapse;width:100%;font-size:12px}.table th{position:sticky;top:0;background:#f5f8f7;padding:9px;text-align:left;white-space:nowrap}.table td{padding:8px 9px;border-top:1px solid #edf1f0;white-space:nowrap}.table td.num{text-align:right;font:600 12px ui-monospace,Consolas}.legend{font-size:12px;margin-bottom:10px}.sw{display:inline-block;width:9px;height:9px;margin:0 5px 0 13px}.empty{padding:30px;text-align:center;color:var(--muted)}
 @media(max-width:950px){.side{width:185px}.main{width:calc(100% - 185px)}.areas,.executive,.kpis,.machineGrid,.two{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(3,1fr)}.bar{grid-template-columns:100px 150px 1fr}}@media(max-width:650px){.app{display:block}.side{width:100%;height:auto;position:static}.main{width:100%;padding:14px}.areas,.executive,.kpis,.machineGrid,.two,.filters{grid-template-columns:1fr}.top{display:block}.tools{margin-top:12px;flex-wrap:wrap}}
 </style></head><body><div class="app"><aside class="side"><div class="logoBox"><img src="Logo_JV International.png" alt="JV International Solutions Inc."></div><div class="sideLabel">DASHBOARD DE PRODUCCIÓN</div><nav id="nav" class="nav"></nav></aside><main id="view" class="main"></main></div>
 <script>
@@ -298,7 +298,7 @@ function downtime(rs){return rs.reduce((s,r)=>s+num(r['TIEMPO MUERTO (MINS)'])+n
 function group(rs,key,value){let m={};rs.forEach(r=>{let k=empty(r[key])?(EMPTY[key]||'Sin información'):String(r[key]).trim();m[k]=(m[k]||0)+num(r[value])});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
 function downGroup(rs,key){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(v){let k=empty(r[key])?(EMPTY[key]||'Sin información'):String(r[key]).trim();m[k]=(m[k]||0)+v}});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
 function bars(a,color,timeMode=false){let mx=a[0]?.[1]||1,tot=a.reduce((s,x)=>s+x[1],0);return `<div class="bars">${a.map(([k,v])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${timeMode?time(v):fmt(v)} · ${tot?(v/tot*100).toFixed(1):0}%</div><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${color}"></div></div></div>`).join('')||'<div class="empty">0</div>'}</div>`}
-function machines(rs){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(!v)return;let ma=empty(r['NO. MAQUINA'])?'Sin máquina':r['NO. MAQUINA'],mo=empty(r.MOTIVO)?'Sin motivo':r.MOTIVO;m[ma]??={t:0,r:{}};m[ma].t+=v;m[ma].r[mo]=(m[ma].r[mo]||0)+v});return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,6).map(([ma,o])=>{let [mo,v]=Object.entries(o.r).sort((a,b)=>b[1]-a[1])[0];return `<div class="machine"><strong>${esc(ma)}</strong><div class="total">${time(o.t)}</div><div class="reason">Principal motivo<b>${esc(mo)} · ${(v/o.t*100).toFixed(1)}%</b></div></div>`}).join('')||'<div class="empty">Sin tiempo muerto por máquina</div>'}
+function machines(rs){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(!v)return;let ma=empty(r['NO. MAQUINA'])?'Sin máquina':r['NO. MAQUINA'],mo=empty(r.MOTIVO)?'Sin motivo':r.MOTIVO;m[ma]??={t:0,r:{}};m[ma].t+=v;m[ma].r[mo]=(m[ma].r[mo]||0)+v});return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,6).map(([ma,o])=>{let reasons=Object.entries(o.r).sort((a,b)=>b[1]-a[1]).slice(0,4),mx=reasons[0]?.[1]||1;return `<div class="machine"><div class="mHead"><strong>${esc(ma)}</strong><span class="total">${time(o.t)}</span></div><div class="breakdownLabel">Desglose de fallas</div>${reasons.map(([mo,v])=>`<div class="breakdownRow"><span>${esc(mo)}</span><div class="track"><div class="fill" style="width:${(v/mx*100)}%;background:#c0392b"></div></div><span class="bval">${fmt(v)} min (${(v/o.t*100).toFixed(1)}%)</span></div>`).join('')}</div>`}).join('')||'<div class="empty">Sin tiempo muerto por máquina</div>'}
 function general(){PAGE='General';nav();let s=DEPTS.map(d=>{let r=rows(d),c=CFG[d];return {d,r,c,total:sum(r,c.value),down:downtime(r)}}),prod=[...s].sort((a,b)=>b.total-a.total),dw=[...s].sort((a,b)=>b.down-a.down),td=s.reduce((z,x)=>z+x.down,0),all=s.flatMap(x=>x.r);document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta la información de producción por área.</div></div>${periodTools()}</header><section class="panel"><h2 class="sectionTitle">Áreas de producción</h2><div class="areas">${s.map(x=>`<article class="card area" style="--accent:${x.c.accent}" onclick="show('${x.d}')"><b>${x.c.title.toUpperCase()}</b><div class="value">${fmt(x.total)}</div><div class="note">${fmt(x.r.length)} registros del período</div></article>`).join('')}</div></section><section class="executive"><article class="exec card"><div class="klabel">Mayor producción</div><div class="value">${fmt(prod[0].total)}</div><small>${prod[0].c.title}</small></article><article class="exec card"><div class="klabel">Tiempo muerto total</div><div class="value">${time(td)}</div><small>Áreas con registro</small></article><article class="exec card"><div class="klabel">Mayor tiempo muerto</div><div class="value">${time(dw[0].down)}</div><small>${dw[0].c.title}</small></article><article class="exec card"><div class="klabel">Áreas activas</div><div class="value">${s.filter(x=>x.r.length).length}</div><small>Con registros</small></article></section><div class="charts"><section class="panel"><h2 class="sectionTitle">Producción total por área (piezas)</h2>${bars(prod.map(x=>[x.c.title,x.total]),'#08776b')}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por área</h2>${bars(dw.map(x=>[x.c.title,x.down]),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Principales motivos de tiempo muerto</h2>${bars(downGroup(all,'MOTIVO'),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Máquinas con mayor incidencia</h2><div class="machineGrid">${machines(all)}</div></section></div>`}
 function state(d){
 
@@ -439,7 +439,7 @@ function table(d,rs){let cols=Object.keys(DATA[d]?.[0]||{}).filter(k=>k&&k!=='Vi
 function hour(v){let m=String(v||'').match(/(?:T|^)(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:'—'}function duration(a,b){a=hour(a);b=hour(b);if(a==='—'||b==='—')return '—';let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),z=x*60+y-h*60-m;if(z<0)z+=1440;return `${Math.floor(z/60)?Math.floor(z/60)+'h ':''}${z%60}m`}
 function laundryType(r){return /lienzo|tela/i.test(String(r['TIPO DE PRENDA']||''))?'Lienzos':'Prendas'}
 function stack(rs,key){let m={};rs.forEach(r=>{let k=key==='FECHA'?dateFmt(r.FECHA):(empty(r[key])?(EMPTY[key]||'Sin información'):r[key]),t=laundryType(r);m[k]??={Lienzos:0,Prendas:0};m[k][t]+=num(r['TOTAL KGS'])});let a=Object.entries(m).sort((x,y)=>(y[1].Lienzos+y[1].Prendas)-(x[1].Lienzos+x[1].Prendas)),mx=Math.max(1,...a.map(x=>x[1].Lienzos+x[1].Prendas));return `<div class="legend"><i class="sw" style="background:#08776b"></i>Lienzos<i class="sw" style="background:#b8da45"></i>Prendas</div><div class="bars">${a.map(([k,o])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${fmt(o.Lienzos+o.Prendas)} kg</div><div class="track" style="display:flex"><div class="fill" style="width:${o.Lienzos/mx*100}%;background:#08776b"></div><div class="fill" style="width:${o.Prendas/mx*100}%;background:#b8da45"></div></div></div>`).join('')}</div>`}
-function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Detalle por color</h2>${bars(group(r,'COLOR','TOTAL KGS'),c.accent)}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
+function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Kilos por color (lienzos / prendas)</h2>${stack(r,'COLOR')}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
 function show(d){d==='General'?general():area(d)}
 /* ===================================================================
    MOTOR COMPARTIDO DE REPORTES PDF
@@ -578,17 +578,61 @@ function pdfFlatBars(pdf, x, y, w, title, items, colorFn, valueFmt, labelW, rowH
   return top + items.length*rowH;
 }
 
-function pdfInsightCard(pdf, x, y, w, h, num, title, text){
-  pdf.setFillColor(238, 246, 234); pdf.setDrawColor(214, 232, 202);
+/** Agrupa el tiempo muerto por máquina y, dentro de cada máquina, por
+ * motivo — para poder mostrar el caso puntual de cada una (no solo cuál
+ * falla más, sino específicamente por qué). */
+function motivosByMachine(rs){
+  const m = {};
+  rs.forEach(r => {
+    const v = num(r['TIEMPO MUERTO (MINS)']) + num(r['TIEMPO MUERTO']);
+    if(!v) return;
+    const ma = empty(r['NO. MAQUINA']) ? 'Sin m\u00e1quina' : r['NO. MAQUINA'];
+    const mo = empty(r.MOTIVO) ? 'Sin motivo' : r.MOTIVO;
+    m[ma] ??= {t: 0, r: {}};
+    m[ma].t += v;
+    m[ma].r[mo] = (m[ma].r[mo] || 0) + v;
+  });
+  return m;
+}
+
+/** Tarjeta compacta con el desglose de motivos específicos de una máquina
+ * (encabezado con el total, y hasta 4 motivos con su propia barra). */
+function pdfMachineFailureCard(pdf, x, y, w, h, label, total, details){
+  pdf.setFillColor(...C_BG); pdf.setDrawColor(...C_LINE);
   pdf.roundedRect(x, y, w, h, 2, 2, 'FD');
-  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(9);
-  pdf.setTextColor(...C_GREEN);
-  pdf.text(`${num}.`, x+4, y+7);
-  pdf.text(title, x+10, y+7);
-  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7.7);
-  pdf.setTextColor(46, 72, 66);
-  const lines = pdf.splitTextToSize(text, w-8);
-  pdf.text(lines, x+4, y+13);
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(9.5);
+  pdf.setTextColor(...C_INK);
+  pdf.text(label, x+4, y+7.5);
+  pdf.setTextColor(...C_ALERT);
+  pdf.text(time(total), x+w-4, y+7.5, {align: 'right'});
+  pdf.setDrawColor(...C_LINE);
+  pdf.line(x+4, y+10, x+w-4, y+10);
+
+  if(!details.length){
+    pdf.setFont('helvetica', 'italic'); pdf.setFontSize(7.2);
+    pdf.setTextColor(...C_MUTED);
+    pdf.text('Sin desglose disponible.', x+4, y+17);
+    return;
+  }
+
+  const maxv = Math.max(1, ...details.map(d => d[1]));
+  const labelW = 30, rowH = (h - 14) / details.length;
+  const barX0 = x + 4 + labelW;
+  const barW = w - 8 - labelW - 32;
+  details.forEach((d, i) => {
+    const [motivo, mins, pct] = d;
+    const yy = y + 15 + i*rowH;
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(6.9);
+    pdf.setTextColor(...C_INK);
+    pdf.text(pdfTruncate(pdf, motivo, labelW-2), x+4, yy);
+    pdf.setFillColor(...C_TRACK);
+    pdf.roundedRect(barX0, yy-2.3, barW, 2.6, 1, 1, 'F');
+    const fw = Math.max(0.6, barW * (mins/maxv));
+    pdf.setFillColor(...C_ALERT);
+    pdf.roundedRect(barX0, yy-2.3, fw, 2.6, 1, 1, 'F');
+    pdf.setFontSize(6.6);
+    pdf.text(`${fmt(mins)} min (${pct.toFixed(1)}%)`, x+w-4, yy, {align: 'right'});
+  });
 }
 
 /* ===================================================================
@@ -749,26 +793,31 @@ function pdfGeneral(){
   const p2y = PDF_CONTENT_TOP;
   const mTitle = 'Principales motivos de tiempo muerto' + (motivosAll.length>8 ? ' (top 8)' : '');
   const maTitle = 'M\u00e1quinas con mayor incidencia' + (maquinasAll.length>8 ? ' (top 8)' : '');
+
+  // Columna izquierda: motivos y máquinas apilados (uno debajo del otro).
   const m1 = pdfFlatBars(pdf, PDF_MARGIN, p2y, PDF_COL_W, mTitle,
     motivos, () => C_ALERT, v => `${time(v)} (${totMot?(v/totMot*100).toFixed(1):0}%)`, 40);
-  const m2 = pdfFlatBars(pdf, PDF_COL2_X, p2y, PDF_COL_W, maTitle,
+  pdfFlatBars(pdf, PDF_MARGIN, m1+10, PDF_COL_W, maTitle,
     maquinas.map(x => [`M\u00e1quina ${x[0]}`, x[1]]), () => C_ALERT,
     v => `${time(v)} (${totMaq?(v/totMaq*100).toFixed(1):0}%)`, 26);
 
-  const pkY = Math.max(m1, m2) + 10;
+  // Columna derecha: caso puntual — qué motivos específicos afectan a
+  // cada una de las máquinas con mayor incidencia (no solo cuál falla más).
   pdf.setFont('helvetica', 'bold'); pdf.setFontSize(11);
   pdf.setTextColor(...C_INK);
-  pdf.text('Puntos clave del per\u00edodo', PDF_MARGIN, pkY);
+  pdf.text('Detalle de fallas por m\u00e1quina', PDF_COL2_X, p2y);
 
-  const iw = (PDF_W - 2*PDF_MARGIN - 2*4) / 3, ih = 42, iy = pkY + 6;
-  const pct1 = grandTotal ? (prod[0]?.total/grandTotal*100).toFixed(1) : '0';
-  const pct3 = totMot ? (motivos[0]?.[1]/totMot*100).toFixed(1) : '0';
-  pdfInsightCard(pdf, PDF_MARGIN+0*(iw+4), iy, iw, ih, 1, 'Mayor producci\u00f3n',
-    `${prod[0]?.area||'—'} concentra el ${pct1}% del total de piezas producidas en el per\u00edodo.`);
-  pdfInsightCard(pdf, PDF_MARGIN+1*(iw+4), iy, iw, ih, 2, 'Tiempo muerto',
-    `Se registraron ${time(totalDown)} de tiempo muerto en total durante el per\u00edodo.`);
-  pdfInsightCard(pdf, PDF_MARGIN+2*(iw+4), iy, iw, ih, 3, 'Mayor incidencia',
-    `El motivo principal fue ${motivos[0]?.[0]||'—'}, con ${pct3}% del tiempo muerto registrado.`);
+  const byMachine = motivosByMachine(all);
+  const topMachines = maquinas.slice(0, 4);
+  const cardH = 33, cardGap = 5;
+  topMachines.forEach((x, i) => {
+    const ma = x[0];
+    const info = byMachine[ma] || {t: x[1], r: {}};
+    const details = Object.entries(info.r).sort((a,b) => b[1]-a[1]).slice(0, 4)
+      .map(([mo, v]) => [mo, v, info.t ? (v/info.t*100) : 0]);
+    pdfMachineFailureCard(pdf, PDF_COL2_X, p2y+8+i*(cardH+cardGap), PDF_COL_W, cardH,
+      `M\u00e1quina ${ma}`, info.t, details);
+  });
 
   pdfFooter(pdf);
   pdfFinalizePageNumbers(pdf);
