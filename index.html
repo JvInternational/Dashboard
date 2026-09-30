@@ -10,7 +10,7 @@
 </style></head><body><div class="app"><aside class="side"><div class="logoBox"><img src="Logo_JV International.png" alt="JV International Solutions Inc."></div><div class="sideLabel">DASHBOARD DE PRODUCCIÓN</div><nav id="nav" class="nav"></nav></aside><main id="view" class="main"></main></div>
 <script>
 'use strict';
-let DATA={},PAGE='General',PERIOD=localStorage.getItem('jvPeriod')||'',STATE={},CHART=null;
+let DATA={},PAGE='General',PERIOD=localStorage.getItem('jvPeriod')||'',CUSTOM_FROM=localStorage.getItem('jvCustomFrom')||'',CUSTOM_TO=localStorage.getItem('jvCustomTo')||'',STATE={},CHART=null;
 const CFG={
  Estampado:{title:'Estampado',value:'TOTAL',metric:'Piezas trabajadas',accent:'#08776b',groups:['NO. MAQUINA','TIPO DE PRENDA','TIPO DE HIT','ESPECIALIDAD'],down:true},
  Neck:{title:'Neck',value:'TOTAL',metric:'Total de piezas',accent:'#3c6e8f',groups:['NO. MAQUINA','TIPO DE PRENDA']},
@@ -69,6 +69,15 @@ function range(){
     return [
       minDate,
       maxDate
+    ];
+
+  }
+
+  if(PERIOD === 'custom'){
+
+    return [
+      CUSTOM_FROM || minDate,
+      CUSTOM_TO || maxDate
     ];
 
   }
@@ -140,6 +149,9 @@ function monthLabel(){
   if(PERIOD === 'all')
     return 'Todo el histórico';
 
+  if(PERIOD === 'custom')
+    return 'Rango personalizado';
+
   if(PERIOD === 'current')
     return 'Mes actual';
 
@@ -167,65 +179,62 @@ function monthLabel(){
 
 }
 function nav(){document.querySelector('#nav').innerHTML=['General',...DEPTS].map(d=>`<button class="${PAGE===d?'active':''}" onclick="show('${d}')">${d==='Lavanderia'?'Lavandería':d}</button>`).join('')}
+function setPeriod(value){
+  PERIOD=value;
+  localStorage.setItem('jvPeriod',PERIOD);
+  STATE={};
+  setTimeout(() => show(PAGE),10);
+}
+function changeCustomRange(which,value){
+  if(which==='from') CUSTOM_FROM=value;
+  if(which==='to') CUSTOM_TO=value;
+  if(CUSTOM_FROM && CUSTOM_TO && CUSTOM_FROM>CUSTOM_TO){
+    if(which==='from') CUSTOM_TO=CUSTOM_FROM;
+    else CUSTOM_FROM=CUSTOM_TO;
+  }
+  localStorage.setItem('jvCustomFrom',CUSTOM_FROM);
+  localStorage.setItem('jvCustomTo',CUSTOM_TO);
+  STATE={};
+  setTimeout(() => show(PAGE),10);
+}
 function periodTools(){
+  const custom = PERIOD==='custom';
+  const [rangeFrom,rangeTo]=range();
+  const from=CUSTOM_FROM||rangeFrom||'';
+  const to=CUSTOM_TO||rangeTo||'';
 
   return `
     <div class="tools">
 
       <div class="field">
 
-        <label>Período activo</label>
+        <label>${custom?'Rango de fechas':'Período activo'}</label>
 
-        <select
-          onchange="
-            PERIOD=this.value;
-            localStorage.setItem(
-              'jvPeriod',
-              PERIOD
-            );
-            STATE={};
-            setTimeout(
-  () => show(PAGE),
-  10
-);
+        <select onchange="setPeriod(this.value)">
 
-          "
-        >
-
-          <option
-            value="all"
-            ${PERIOD==='all'?'selected':''}
-          >
+          <option value="all" ${PERIOD==='all'?'selected':''}>
             Todo el histórico
           </option>
 
-          <option
-            value="current"
-            ${PERIOD==='current'?'selected':''}
-          >
+          <option value="current" ${PERIOD==='current'?'selected':''}>
             Mes actual
           </option>
 
-          <option
-            value="30"
-            ${PERIOD==='30'?'selected':''}
-          >
+          <option value="30" ${PERIOD==='30'?'selected':''}>
             Últimos 30 días
           </option>
 
-          <option
-            value="90"
-            ${PERIOD==='90'?'selected':''}
-          >
+          <option value="90" ${PERIOD==='90'?'selected':''}>
             Últimos 90 días
+          </option>
+
+          <option value="custom" ${custom?'selected':''}>
+            Rango personalizado
           </option>
 
           ${periodMonths()
             .map(m => `
-              <option
-                value="${m}"
-                ${m===PERIOD?'selected':''}
-              >
+              <option value="${m}" ${m===PERIOD?'selected':''}>
                 ${monthName(m)}
               </option>
             `)
@@ -236,18 +245,26 @@ function periodTools(){
 
       </div>
 
+      ${custom?`
+        <div class="field">
+          <label>Desde</label>
+          <input type="date" value="${from}" max="${to}" onchange="changeCustomRange('from',this.value)">
+        </div>
+        <div class="field">
+          <label>Hasta</label>
+          <input type="date" value="${to}" min="${from}" onchange="changeCustomRange('to',this.value)">
+        </div>
+      `:''}
+
       <div class="periodInfo">
 
-        <b>Período activo</b>
+        <b>${custom?'Rango de fechas':'Período activo'}</b>
 
         ${periodText()}
 
       </div>
 
-      <button
-        class="btn"
-        onclick="pdfGeneral()"
-      >
+      <button class="btn" onclick="pdfGeneral()">
         Exportar PDF
       </button>
 
@@ -259,6 +276,11 @@ function monthName(m){let [y,x]=m.split('-');return new Intl.DateTimeFormat('es-
 
   const [a,b] =
     range();
+
+  if(PERIOD === 'custom')
+    return `
+      ${dateFmt(a)} – ${dateFmt(b)}
+    `;
 
   if(PERIOD === 'all')
     return `
@@ -439,7 +461,7 @@ function table(d,rs){let cols=Object.keys(DATA[d]?.[0]||{}).filter(k=>k&&k!=='Vi
 function hour(v){let m=String(v||'').match(/(?:T|^)(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:'—'}function duration(a,b){a=hour(a);b=hour(b);if(a==='—'||b==='—')return '—';let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),z=x*60+y-h*60-m;if(z<0)z+=1440;return `${Math.floor(z/60)?Math.floor(z/60)+'h ':''}${z%60}m`}
 function laundryType(r){return /lienzo|tela/i.test(String(r['TIPO DE PRENDA']||''))?'Lienzos':'Prendas'}
 function stack(rs,key){let m={};rs.forEach(r=>{let k=key==='FECHA'?dateFmt(r.FECHA):(empty(r[key])?(EMPTY[key]||'Sin información'):r[key]),t=laundryType(r);m[k]??={Lienzos:0,Prendas:0};m[k][t]+=num(r['TOTAL KGS'])});let a=Object.entries(m).sort((x,y)=>(y[1].Lienzos+y[1].Prendas)-(x[1].Lienzos+x[1].Prendas)),mx=Math.max(1,...a.map(x=>x[1].Lienzos+x[1].Prendas));return `<div class="legend"><i class="sw" style="background:#08776b"></i>Lienzos<i class="sw" style="background:#b8da45"></i>Prendas</div><div class="bars">${a.map(([k,o])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${fmt(o.Lienzos+o.Prendas)} kg</div><div class="track" style="display:flex"><div class="fill" style="width:${o.Lienzos/mx*100}%;background:#08776b"></div><div class="fill" style="width:${o.Prendas/mx*100}%;background:#b8da45"></div></div></div>`).join('')}</div>`}
-function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>Período activo</b>${periodText()}<br>${dateFmt(state(d).a)} – ${dateFmt(state(d).b)}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Kilos por color (lienzos / prendas)</h2>${stack(r,'COLOR')}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
+function area(d){PAGE=d;nav();let c=CFG[d],r=filtered(d),total=sum(r,c.value),down=downtime(r),fourth=d==='Ejemplos'?['Tiendas',unique(r,'TIENDA')]:d==='Neck'?['Máquinas activas',unique(r,'NO. MAQUINA')]:d==='Cuadros'?['Departamentos',unique(r,'DEPT')]:[c.down?'Tiempo muerto':'Días con actividad',c.down?time(down):unique(r,'FECHA')],second=d==='Lavanderia'?['Total KGS',sum(r,'TOTAL KGS')]:d==='Cuadros'?['Procesos',unique(r,'PROCESO')]:d==='Ejemplos'?['Clientes',unique(r,'CLIENTE')]:['WO contabilizadas',unique(r,'NO. WO')];document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">${c.title}</h1><div class="desc">Detalle operativo del período seleccionado.</div></div><div class="periodInfo"><b>${PERIOD==='custom'?'Rango de fechas':'Período activo'}</b>${periodText()}</div></header>${filterUI(d)}<div class="kpis">${kpi(c.metric,total,c.accent)}${kpi(second[0],second[1],c.accent)}${kpi('Registros del período',r.length,c.accent)}${kpi(fourth[0],fourth[1],c.accent)}</div><section class="panel"><h2 class="sectionTitle">${d==='Lavanderia'?'Piezas':'Producción'} por fecha</h2><div class="chart"><canvas id="trend"></canvas></div></section>${d==='Lavanderia'?`<div class="two"><section class="panel"><h2 class="sectionTitle">Kilos por fecha (lienzos / prendas)</h2>${stack(r,'FECHA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por máquina (lienzos / prendas)</h2>${stack(r,'NO. MAQUINA')}</section><section class="panel"><h2 class="sectionTitle">Kilos por proceso (lienzos / prendas)</h2>${stack(r,'TIPO DE PROCESO')}</section><section class="panel"><h2 class="sectionTitle">Kilos por color (lienzos / prendas)</h2>${stack(r,'COLOR')}</section></div>`:c.groups.map(k=>`<section class="panel"><h2 class="sectionTitle">Detalle por ${LABEL[k]}</h2>${bars(group(r,k,c.value),c.accent)}</section>`).join('')}${c.down?`<section class="panel"><h2 class="sectionTitle">Tiempo muerto por motivo</h2>${bars(downGroup(r,'MOTIVO'),c.accent,true)}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por máquina</h2>${bars(downGroup(r,'NO. MAQUINA'),c.accent,true)}</section>`:''}<section class="panel"><h2 class="sectionTitle">Registros</h2>${table(d,r)}</section>`;trend(r,c.value,'trend',c.accent)}
 function show(d){d==='General'?general():area(d)}
 /* ===================================================================
    MOTOR COMPARTIDO DE REPORTES PDF
@@ -848,6 +870,14 @@ fetch('data.json?v='+Date.now())
 
   PERIOD =
     PERIOD || 'all';
+
+  if(PERIOD === 'custom'){
+    const [defaultFrom,defaultTo] = range();
+    CUSTOM_FROM = CUSTOM_FROM || defaultFrom;
+    CUSTOM_TO = CUSTOM_TO || defaultTo;
+    localStorage.setItem('jvCustomFrom',CUSTOM_FROM);
+    localStorage.setItem('jvCustomTo',CUSTOM_TO);
+  }
 
   setTimeout(
   () => general(),
