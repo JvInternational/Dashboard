@@ -64,20 +64,17 @@ function range(){
   const maxDate =
     allDates.at(-1);
 
+  if(PERIOD === 'custom'){
+    const from = CUSTOM_FROM || minDate;
+    const to = CUSTOM_TO || maxDate;
+    return from <= to ? [from, to] : [to, from];
+  }
+
   if(PERIOD === 'all'){
 
     return [
       minDate,
       maxDate
-    ];
-
-  }
-
-  if(PERIOD === 'custom'){
-
-    return [
-      CUSTOM_FROM || minDate,
-      CUSTOM_TO || maxDate
     ];
 
   }
@@ -149,9 +146,6 @@ function monthLabel(){
   if(PERIOD === 'all')
     return 'Todo el histórico';
 
-  if(PERIOD === 'custom')
-    return 'Rango personalizado';
-
   if(PERIOD === 'current')
     return 'Mes actual';
 
@@ -180,94 +174,59 @@ function monthLabel(){
 }
 function nav(){document.querySelector('#nav').innerHTML=['General',...DEPTS].map(d=>`<button class="${PAGE===d?'active':''}" onclick="show('${d}')">${d==='Lavanderia'?'Lavandería':d}</button>`).join('')}
 function setPeriod(value){
-  PERIOD=value;
-  localStorage.setItem('jvPeriod',PERIOD);
-  STATE={};
-  setTimeout(() => show(PAGE),10);
-}
-function changeCustomRange(which,value){
-  if(which==='from') CUSTOM_FROM=value;
-  if(which==='to') CUSTOM_TO=value;
-  if(CUSTOM_FROM && CUSTOM_TO && CUSTOM_FROM>CUSTOM_TO){
-    if(which==='from') CUSTOM_TO=CUSTOM_FROM;
-    else CUSTOM_FROM=CUSTOM_TO;
+  PERIOD = value;
+  localStorage.setItem('jvPeriod', PERIOD);
+  if(PERIOD === 'custom'){
+    const [from, to] = range();
+    CUSTOM_FROM = CUSTOM_FROM || from;
+    CUSTOM_TO = CUSTOM_TO || to;
+    localStorage.setItem('jvCustomFrom', CUSTOM_FROM);
+    localStorage.setItem('jvCustomTo', CUSTOM_TO);
   }
-  localStorage.setItem('jvCustomFrom',CUSTOM_FROM);
-  localStorage.setItem('jvCustomTo',CUSTOM_TO);
-  STATE={};
-  setTimeout(() => show(PAGE),10);
+  STATE = {};
+  setTimeout(() => show(PAGE), 10);
+}
+function changeCustomRange(field,value){
+  if(field === 'from') CUSTOM_FROM = value;
+  if(field === 'to') CUSTOM_TO = value;
+  if(CUSTOM_FROM && CUSTOM_TO && CUSTOM_FROM > CUSTOM_TO){
+    if(field === 'from') CUSTOM_TO = CUSTOM_FROM;
+    else CUSTOM_FROM = CUSTOM_TO;
+  }
+  localStorage.setItem('jvCustomFrom', CUSTOM_FROM);
+  localStorage.setItem('jvCustomTo', CUSTOM_TO);
+  STATE = {};
+  setTimeout(() => show(PAGE), 10);
 }
 function periodTools(){
-  const custom = PERIOD==='custom';
-  const [rangeFrom,rangeTo]=range();
-  const from=CUSTOM_FROM||rangeFrom||'';
-  const to=CUSTOM_TO||rangeTo||'';
-
+  const [from,to] = range();
   return `
     <div class="tools">
-
       <div class="field">
-
-        <label>${custom?'Rango de fechas':'Período activo'}</label>
-
+        <label>Período activo</label>
         <select onchange="setPeriod(this.value)">
-
-          <option value="all" ${PERIOD==='all'?'selected':''}>
-            Todo el histórico
-          </option>
-
-          <option value="current" ${PERIOD==='current'?'selected':''}>
-            Mes actual
-          </option>
-
-          <option value="30" ${PERIOD==='30'?'selected':''}>
-            Últimos 30 días
-          </option>
-
-          <option value="90" ${PERIOD==='90'?'selected':''}>
-            Últimos 90 días
-          </option>
-
-          <option value="custom" ${custom?'selected':''}>
-            Rango personalizado
-          </option>
-
-          ${periodMonths()
-            .map(m => `
-              <option value="${m}" ${m===PERIOD?'selected':''}>
-                ${monthName(m)}
-              </option>
-            `)
-            .join('')
-          }
-
+          <option value="all" ${PERIOD==='all'?'selected':''}>Todo el histórico</option>
+          <option value="custom" ${PERIOD==='custom'?'selected':''}>Rango personalizado</option>
+          ${periodMonths().map(m => `
+            <option value="${m}" ${m===PERIOD?'selected':''}>${monthName(m)}</option>
+          `).join('')}
         </select>
-
       </div>
-
-      ${custom?`
+      ${PERIOD==='custom' ? `
         <div class="field">
           <label>Desde</label>
-          <input type="date" value="${from}" max="${to}" onchange="changeCustomRange('from',this.value)">
+          <input type="date" value="${from||''}" onchange="changeCustomRange('from',this.value)">
         </div>
         <div class="field">
           <label>Hasta</label>
-          <input type="date" value="${to}" min="${from}" onchange="changeCustomRange('to',this.value)">
+          <input type="date" value="${to||''}" onchange="changeCustomRange('to',this.value)">
         </div>
-      `:''}
-
+      ` : ''}
       <div class="periodInfo">
-
-        <b>${custom?'Rango de fechas':'Período activo'}</b>
-
+        <b>${PERIOD==='custom'?'Rango de fechas':'Período activo'}</b>
         ${periodText()}
-
       </div>
-
-      <button class="btn" onclick="pdfGeneral()">
-        Exportar PDF
-      </button>
-
+      <button class="btn" onclick="pdfGeneral()">Exportar PDF</button>
     </div>
   `;
 }
@@ -519,7 +478,7 @@ function pdfHeader(pdf, title, period){
   pdf.text(title, badgeX + badgeW + 8, PDF_BAND_H/2 + 2);
 
   pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9.5);
-  pdf.text('Per\u00edodo: ' + period, PDF_W - 8, 13, {align: 'right'});
+  pdf.text('Rango de fechas: ' + period, PDF_W - 8, 13, {align: 'right'});
 
   pdf._pdfPageNumSlots = pdf._pdfPageNumSlots || [];
   pdf._pdfPageNumSlots.push({page: pdf.internal.getNumberOfPages(), where: 'header', x: PDF_W-8, y: 19});
@@ -868,16 +827,8 @@ fetch('data.json?v='+Date.now())
 
   DATA=j;
 
-  PERIOD =
-    PERIOD || 'all';
-
-  if(PERIOD === 'custom'){
-    const [defaultFrom,defaultTo] = range();
-    CUSTOM_FROM = CUSTOM_FROM || defaultFrom;
-    CUSTOM_TO = CUSTOM_TO || defaultTo;
-    localStorage.setItem('jvCustomFrom',CUSTOM_FROM);
-    localStorage.setItem('jvCustomTo',CUSTOM_TO);
-  }
+  const allowedPeriods = new Set(['all','custom',...periodMonths()]);
+  PERIOD = allowedPeriods.has(PERIOD) ? PERIOD : 'all';
 
   setTimeout(
   () => general(),
