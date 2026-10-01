@@ -280,7 +280,12 @@ function group(rs,key,value){let m={};rs.forEach(r=>{let k=empty(r[key])?(EMPTY[
 function downGroup(rs,key){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(v){let k=empty(r[key])?(EMPTY[key]||'Sin información'):String(r[key]).trim();m[k]=(m[k]||0)+v}});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
 function bars(a,color,timeMode=false){let mx=a[0]?.[1]||1,tot=a.reduce((s,x)=>s+x[1],0);return `<div class="bars">${a.map(([k,v])=>`<div class="bar"><div>${esc(k)}</div><div class="val">${timeMode?time(v):fmt(v)} · ${tot?(v/tot*100).toFixed(1):0}%</div><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${color}"></div></div></div>`).join('')||'<div class="empty">0</div>'}</div>`}
 function machines(rs){let m={};rs.forEach(r=>{let v=num(r['TIEMPO MUERTO (MINS)'])+num(r['TIEMPO MUERTO']);if(!v)return;let ma=empty(r['NO. MAQUINA'])?'Sin máquina':r['NO. MAQUINA'],mo=empty(r.MOTIVO)?'Sin motivo':r.MOTIVO;m[ma]??={t:0,r:{}};m[ma].t+=v;m[ma].r[mo]=(m[ma].r[mo]||0)+v});return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,6).map(([ma,o])=>{let reasons=Object.entries(o.r).sort((a,b)=>b[1]-a[1]).slice(0,4),mx=reasons[0]?.[1]||1;return `<div class="machine"><div class="mHead"><strong>${esc(ma)}</strong><span class="total">${time(o.t)}</span></div><div class="breakdownLabel">Desglose de fallas</div>${reasons.map(([mo,v])=>`<div class="breakdownRow"><span>${esc(mo)}</span><div class="track"><div class="fill" style="width:${(v/mx*100)}%;background:#c0392b"></div></div><span class="bval">${fmt(v)} min (${(v/o.t*100).toFixed(1)}%)</span></div>`).join('')}</div>`}).join('')||'<div class="empty">Sin tiempo muerto por máquina</div>'}
-function general(){PAGE='General';nav();let s=DEPTS.map(d=>{let r=rows(d),c=CFG[d];return {d,r,c,total:sum(r,c.value),down:downtime(r)}}),prod=[...s].sort((a,b)=>b.total-a.total),dw=[...s].sort((a,b)=>b.down-a.down),td=s.reduce((z,x)=>z+x.down,0),all=s.flatMap(x=>x.r);document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta la información de producción por área.</div></div>${periodTools()}</header><section class="panel"><h2 class="sectionTitle">Áreas de producción</h2><div class="areas">${s.map(x=>`<article class="card area" style="--accent:${x.c.accent}" onclick="show('${x.d}')"><b>${x.c.title.toUpperCase()}</b><div class="value">${fmt(x.total)}</div><div class="note">${fmt(x.r.length)} registros del período</div></article>`).join('')}</div></section><section class="executive"><article class="exec card"><div class="klabel">Mayor producción</div><div class="value">${fmt(prod[0].total)}</div><small>${prod[0].c.title}</small></article><article class="exec card"><div class="klabel">Tiempo muerto total</div><div class="value">${time(td)}</div><small>Áreas con registro</small></article><article class="exec card"><div class="klabel">Mayor tiempo muerto</div><div class="value">${time(dw[0].down)}</div><small>${dw[0].c.title}</small></article><article class="exec card"><div class="klabel">Áreas activas</div><div class="value">${s.filter(x=>x.r.length).length}</div><small>Con registros</small></article></section><div class="charts"><section class="panel"><h2 class="sectionTitle">Producción total por área (piezas)</h2>${bars(prod.map(x=>[x.c.title,x.total]),'#08776b')}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por área</h2>${bars(dw.map(x=>[x.c.title,x.down]),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Principales motivos de tiempo muerto</h2>${bars(downGroup(all,'MOTIVO'),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Máquinas con mayor incidencia</h2><div class="machineGrid">${machines(all)}</div></section></div>`}
+function generalRows(d){
+  const rs = rows(d);
+  if(d !== 'Lavanderia') return rs;
+  return rs.filter(r => String(r['TIPO DE PROCESO'] || '').trim().toUpperCase() === 'SECADO');
+}
+function general(){PAGE='General';nav();let s=DEPTS.map(d=>{let r=generalRows(d),c=CFG[d];return {d,r,c,total:sum(r,c.value),down:downtime(r)}}),prod=[...s].sort((a,b)=>b.total-a.total),dw=[...s].sort((a,b)=>b.down-a.down),td=s.reduce((z,x)=>z+x.down,0),all=s.flatMap(x=>x.r);document.querySelector('#view').innerHTML=`<header class="top"><div><h1 class="title">Dashboard de Producción</h1><div class="desc">Consulta la información de producción por área.</div></div>${periodTools()}</header><section class="panel"><h2 class="sectionTitle">Áreas de producción</h2><div class="areas">${s.map(x=>`<article class="card area" style="--accent:${x.c.accent}" onclick="show('${x.d}')"><b>${x.c.title.toUpperCase()}</b><div class="value">${fmt(x.total)}</div><div class="note">${fmt(x.r.length)} registros del período</div></article>`).join('')}</div></section><section class="executive"><article class="exec card"><div class="klabel">Mayor producción</div><div class="value">${fmt(prod[0].total)}</div><small>${prod[0].c.title}</small></article><article class="exec card"><div class="klabel">Tiempo muerto total</div><div class="value">${time(td)}</div><small>Áreas con registro</small></article><article class="exec card"><div class="klabel">Mayor tiempo muerto</div><div class="value">${time(dw[0].down)}</div><small>${dw[0].c.title}</small></article><article class="exec card"><div class="klabel">Áreas activas</div><div class="value">${s.filter(x=>x.r.length).length}</div><small>Con registros</small></article></section><div class="charts"><section class="panel"><h2 class="sectionTitle">Producción total por área (piezas)</h2>${bars(prod.map(x=>[x.c.title,x.total]),'#08776b')}</section><section class="panel"><h2 class="sectionTitle">Tiempo muerto por área</h2>${bars(dw.map(x=>[x.c.title,x.down]),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Principales motivos de tiempo muerto</h2>${bars(downGroup(all,'MOTIVO'),'#08776b',true)}</section><section class="panel"><h2 class="sectionTitle">Máquinas con mayor incidencia</h2><div class="machineGrid">${machines(all)}</div></section></div>`}
 function state(d){
 
   let [a,b] = range();
@@ -738,7 +743,7 @@ function pdfGeneral(){
   const period = `${dateFmt(from)} - ${dateFmt(to)}`;
 
   const stats = DEPTS.map(d => {
-    const rs = rows(d), c = CFG[d];
+    const rs = generalRows(d), c = CFG[d];
     return {area: c.title, key: d,
              accent: c.accent, total: sum(rs, c.value), down: downtime(rs), rows: rs.length};
   });
@@ -763,7 +768,7 @@ function pdfGeneral(){
   const b2 = pdfFlatBars(pdf, PDF_COL2_X, chartY, PDF_COL_W, 'Tiempo muerto por \u00e1rea',
     dead.map(x => [x.area, x.down]), () => C_ALERT, v => time(v), 24);
 
-  const lav = rows('Lavanderia');
+  const lav = generalRows('Lavanderia');
   const totalKg = sum(lav, 'TOTAL KGS');
   let lienzos = 0, prendas = 0;
   lav.forEach(r => { const kg = num(r['TOTAL KGS']); if(laundryType(r)==='Lienzos') lienzos += kg; else prendas += kg; });
@@ -779,7 +784,7 @@ function pdfGeneral(){
   pdf.addPage();
   pdfHeader(pdf, 'Informe General de Producci\u00f3n', period);
 
-  const all = DEPTS.flatMap(d => rows(d));
+  const all = DEPTS.flatMap(d => generalRows(d));
   const motivosAll = downGroup(all, 'MOTIVO');
   const maquinasAll = downGroup(all, 'NO. MAQUINA');
   const motivos = motivosAll.slice(0, 8);
