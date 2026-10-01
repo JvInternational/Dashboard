@@ -821,27 +821,23 @@ function pdfGeneral(){
   pdf.save(`JVInternational_InformeGeneral_Generado-${new Date().toISOString().slice(0,10)}.pdf`);
 }
 
-fetch('data.json?v='+Date.now())
-.then(r=>r.json())
-.then(j=>{
+fetch(`https://jvinternational.github.io/Dashboard/data.json?ts=${Date.now()}`, {
+  cache: 'no-store'
+})
+.then(r => {
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+})
+.then(j => {
+  DATA = j;
 
-  DATA=j;
-
-  const allowedPeriods = new Set(['all','custom',...periodMonths()]);
+  const allowedPeriods = new Set(['all', 'custom', ...periodMonths()]);
   PERIOD = allowedPeriods.has(PERIOD) ? PERIOD : 'all';
 
-  setTimeout(
-  () => general(),
-  10
-);
-
+  setTimeout(() => general(), 10);
 })
-.catch(e=>{
-
-  document.querySelector(
-    '#view'
-  ).innerHTML =
+.catch(() => {
+  document.querySelector('#view').innerHTML =
     '<div class="panel"><b>No se pudo cargar data.json.</b></div>';
-
 });
 </script></body></html>
