@@ -435,7 +435,18 @@ function show(d){d==='General'?general():area(d)}
 let LOGO_IMG = null;
 (function preloadLogo(){
   const img = new Image();
-  img.onload = () => { LOGO_IMG = img; };
+  img.onload = () => {
+    const maxW = 900;
+    const scale = Math.min(1, maxW / img.naturalWidth);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    LOGO_IMG = canvas.toDataURL('image/jpeg', 0.82);
+  };
   img.src = 'Logo_JV International.png';
 })();
 
@@ -474,7 +485,7 @@ function pdfHeader(pdf, title, period){
   pdf.roundedRect(badgeX, badgeY, badgeW, badgeH, 1.5, 1.5, 'F');
   if(LOGO_IMG){
     const pad = 1.4;
-    try{ pdf.addImage(LOGO_IMG, 'PNG', badgeX+pad, badgeY+pad, badgeW-2*pad, badgeH-2*pad); }
+    try{ pdf.addImage(LOGO_IMG, 'JPEG', badgeX+pad, badgeY+pad, badgeW-2*pad, badgeH-2*pad, 'jv-logo', 'FAST'); }
     catch(e){ /* el logo aún no cargó a tiempo; se omite sin romper el PDF */ }
   }
 
