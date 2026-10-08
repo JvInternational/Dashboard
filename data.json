@@ -4991,7 +4991,7 @@
       "NO. MAQUINA": 3,
       "TOTAL": 2960,
       "ESPECIALIDAD": "",
-      "TIEMPO MUERTO (MINS)": "",
+      "TIEMPO MUERTO (MINS)": 120,
       "MOTIVO": "FALTA PERSONAL",
       "COMENTARIOS": "REGRESARON AL OPERADOR"
     },
@@ -25337,7 +25337,7 @@
     {
       "FOLIO": 162,
       "FECHA": "",
-      "CLIENTE": "BIOWORLD",
+      "CLIENTE": "",
       "NO. FOLDER": "",
       "ESTILO": "",
       "CUADROS": "",
@@ -34373,6 +34373,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-10-08T08:08:35.693Z",
+  "generatedAt": "2026-10-08T15:18:06.277Z",
   "source": "Google Sheets"
 }
