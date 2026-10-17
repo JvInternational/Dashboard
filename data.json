@@ -25896,7 +25896,7 @@
       "TIPO DE HIT": "FRONT",
       "PRENDAS": 6,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25910,7 +25910,7 @@
       "TIPO DE HIT": "FRONT",
       "PRENDAS": 6,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25924,7 +25924,7 @@
       "TIPO DE HIT": "FRONT",
       "PRENDAS": 6,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25938,7 +25938,7 @@
       "TIPO DE HIT": "FRONT",
       "PRENDAS": 2,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25952,7 +25952,7 @@
       "TIPO DE HIT": "SLEEVE RTH",
       "PRENDAS": 2,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25966,7 +25966,7 @@
       "TIPO DE HIT": "SLEEVE LFT",
       "PRENDAS": 2,
       "DEPTO": "EJEMPLOS",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -25999,17 +25999,17 @@
     },
     {
       "FOLIO": 174,
-      "FECHA": "2026-10-15T07:00:00.000Z",
-      "CLIENTE": "",
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
       "NO. FOLDER": "",
-      "ESTILO": "",
-      "CUADROS": "",
-      "TIENDA": "",
-      "TIPO DE HIT": "",
-      "PRENDAS": "",
-      "DEPTO": "",
-      "ESPECIALIDAD": "",
-      "NOTAS": ""
+      "ESTILO": "TSMBURNCCS ",
+      "CUADROS": 5,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 3,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": "RESAMPLE"
     }
   ],
   "Lavanderia": [
@@ -37470,6 +37470,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-10-16T19:26:48.227Z",
+  "generatedAt": "2026-10-17T08:08:51.459Z",
   "source": "Google Sheets"
 }
