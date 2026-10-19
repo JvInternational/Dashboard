@@ -5489,6 +5489,66 @@
       "TIEMPO MUERTO (MINS)": 60,
       "MOTIVO": "CAMBIO PAPEL/COSTRAS",
       "COMENTARIOS": "CAMBIO PAPEL (25MIN) + CAMBIO DE PALETAS PARA TALLAS CHICAS (35MIN)"
+    },
+    {
+      "FOLIO": 367,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189442,
+      "ESTILO": "LSFCAM4BTT",
+      "CANT. COLORES": 12,
+      "TIPO DE PRENDA": "SUDADERA",
+      "TIPO DE HIT": "FRENTE",
+      "NO. MAQUINA": 1,
+      "TOTAL": 775,
+      "ESPECIALIDAD": "",
+      "TIEMPO MUERTO (MINS)": 20,
+      "MOTIVO": "AJUSTE COLORES",
+      "COMENTARIOS": "AJUSTE PARA INICIAR LA MAQUINA"
+    },
+    {
+      "FOLIO": 368,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189442,
+      "ESTILO": "LSFCAM4BTT",
+      "CANT. COLORES": 12,
+      "TIPO DE PRENDA": "SUDADERA",
+      "TIPO DE HIT": "FRENTE",
+      "NO. MAQUINA": 1,
+      "TOTAL": 274,
+      "ESPECIALIDAD": "",
+      "TIEMPO MUERTO (MINS)": 420,
+      "MOTIVO": "FALTA INSUMOS",
+      "COMENTARIOS": "SETUP (60MIN) + ESPERA DE BASE (360MIN)"
+    },
+    {
+      "FOLIO": 369,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189442,
+      "ESTILO": "LSFCDXMBTT",
+      "CANT. COLORES": 12,
+      "TIPO DE PRENDA": "SUDADERA",
+      "TIPO DE HIT": "ESPALDA",
+      "NO. MAQUINA": 3,
+      "TOTAL": 702,
+      "ESPECIALIDAD": "",
+      "TIEMPO MUERTO (MINS)": "",
+      "MOTIVO": "",
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 370,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189442,
+      "ESTILO": "LSFCAM4BTT",
+      "CANT. COLORES": 12,
+      "TIPO DE PRENDA": "SUDADERA",
+      "TIPO DE HIT": "FRENTE",
+      "NO. MAQUINA": 2,
+      "TOTAL": 500,
+      "ESPECIALIDAD": "",
+      "TIEMPO MUERTO (MINS)": "",
+      "MOTIVO": "",
+      "COMENTARIOS": ""
     }
   ],
   "Neck": [
@@ -7899,17 +7959,67 @@
       "ESTILO": "LSFCDXMBTT",
       "TIPO DE PRENDA": "SUDADERA",
       "NO. MAQUINA": 1,
-      "TOTAL": 3280,
+      "TOTAL": 3289,
       "COMENTARIOS": ""
     },
     {
       "FOLIO": 242,
       "FECHA": "2026-10-15T07:00:00.000Z",
       "NO. WO": 189442,
+      "ESTILO": "LSFCAM4BTT",
+      "TIPO DE PRENDA": "SUDADERA",
+      "NO. MAQUINA": 4,
+      "TOTAL": 2514,
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 243,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189442,
       "ESTILO": "LSFCDXMBTT",
       "TIPO DE PRENDA": "SUDADERA",
       "NO. MAQUINA": 1,
-      "TOTAL": 2514,
+      "TOTAL": 2729,
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 244,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 187521,
+      "ESTILO": "LSF9B0LCRU",
+      "TIPO DE PRENDA": "SUDADERA",
+      "NO. MAQUINA": 1,
+      "TOTAL": 622,
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 245,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189825,
+      "ESTILO": "LSM8FUAMIW",
+      "TIPO DE PRENDA": "SUDADERA",
+      "NO. MAQUINA": 4,
+      "TOTAL": 331,
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 246,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189163,
+      "ESTILO": "TSFBJ3SMHA",
+      "TIPO DE PRENDA": "PLAYERA ADULTO",
+      "NO. MAQUINA": 4,
+      "TOTAL": 628,
+      "COMENTARIOS": ""
+    },
+    {
+      "FOLIO": 247,
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 188242,
+      "ESTILO": "LSFA0R3HSR",
+      "TIPO DE PRENDA": "SUDADERA",
+      "NO. MAQUINA": 4,
+      "TOTAL": 618,
       "COMENTARIOS": ""
     }
   ],
@@ -9023,20 +9133,20 @@
     },
     {
       "FOLIO": 124,
-      "FECHA": "",
-      "CANT. CUADROS": "",
-      "PROCESO": "",
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "CANT. CUADROS": 31,
+      "PROCESO": "REVELADO",
       "ESPECIALIDAD": "",
-      "DEPT": "",
+      "DEPT": "PRODUCCION",
       "": ""
     },
     {
       "FOLIO": 125,
-      "FECHA": "",
-      "CANT. CUADROS": "",
-      "PROCESO": "",
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "CANT. CUADROS": 33,
+      "PROCESO": "LAVADO",
       "ESPECIALIDAD": "",
-      "DEPT": "",
+      "DEPT": "PRODUCCION",
       "": ""
     },
     {
@@ -18943,12 +19053,12 @@
     },
     {
       "FOLIO": 133,
-      "FECHA": "",
-      "NO. WO": "",
-      "ESTILO": "",
-      "TIPO DE PRENDA": "",
-      "TIPO DE EMPAQUE": "",
-      "TOTAL": "",
+      "FECHA": "2026-10-16T07:00:00.000Z",
+      "NO. WO": 189277,
+      "ESTILO": "HDFC9NRKMI",
+      "TIPO DE PRENDA": "SUDADERA GORRO",
+      "TIPO DE EMPAQUE": "PREPACK",
+      "TOTAL": 1906,
       "TIEMPO MUERTO": "",
       "MOTIVO": "",
       "": ""
@@ -26010,6 +26120,34 @@
       "DEPTO": "EJEMPLOS",
       "ESPECIALIDAD": "NONE",
       "NOTAS": "RESAMPLE"
+    },
+    {
+      "FOLIO": 175,
+      "FECHA": "2026-10-19T07:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "HDFCEUKBTT",
+      "CUADROS": 12,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 4,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": 176,
+      "FECHA": "2026-10-19T07:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "HDFCEUKBTT",
+      "CUADROS": 13,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "BACK",
+      "PRENDAS": 4,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
     }
   ],
   "Lavanderia": [
@@ -37470,6 +37608,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-10-19T08:08:37.008Z",
+  "generatedAt": "2026-10-19T15:47:51.024Z",
   "source": "Google Sheets"
 }
