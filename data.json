@@ -12432,7 +12432,7 @@
     },
     {
       "FOLIO": 170,
-      "FECHA": "2026-11-06T08:00:00.000Z",
+      "FECHA": "2026-11-05T08:00:00.000Z",
       "CANT. CUADROS": 10,
       "PROCESO": "REVELADO",
       "ESPECIALIDAD": "",
@@ -12441,7 +12441,7 @@
     },
     {
       "FOLIO": 171,
-      "FECHA": "2026-11-06T08:00:00.000Z",
+      "FECHA": "2026-11-05T08:00:00.000Z",
       "CANT. CUADROS": 34,
       "PROCESO": "EMULSIONADO",
       "ESPECIALIDAD": "",
@@ -41123,6 +41123,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-06T22:05:06.333Z",
+  "generatedAt": "2026-11-06T22:09:13.407Z",
   "source": "Google Sheets"
 }
