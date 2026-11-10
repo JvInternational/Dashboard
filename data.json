@@ -29713,6 +29713,90 @@
       "DEPTO": "EJEMPLOS",
       "ESPECIALIDAD": "NONE",
       "NOTAS": ""
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "2026-11-09T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSF6G2SKRG",
+      "CUADROS": 2,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 3,
+      "DEPTO": "CONTRACTUAL",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "2026-11-09T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSFC3LWFBY",
+      "CUADROS": 5,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 3,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "2026-11-09T08:00:00.000Z",
+      "CLIENTE": "THIRTY SINGLE",
+      "NO. FOLDER": "",
+      "ESTILO": "WGN-1572 4.8W SEP - LOCAL CELEBRITY",
+      "CUADROS": 2,
+      "TIENDA": "FASHION NOVA",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "2026-11-09T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSMAMDHBTM",
+      "CUADROS": 9,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "PRODUCCION",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": "REEMPLAZO"
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "2026-11-09T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSFBMGHSTC",
+      "CUADROS": 6,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "COUNTER",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": "",
+      "FECHA": "",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSFBTWBFBT",
+      "CUADROS": 7,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "COUNTER",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
     }
   ],
   "Lavanderia": [
@@ -41173,6 +41257,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-09T17:02:52.969Z",
+  "generatedAt": "2026-11-10T09:08:34.290Z",
   "source": "Google Sheets"
 }
