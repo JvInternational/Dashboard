@@ -40043,7 +40043,7 @@
       "NO. MAQUINA": 1,
       "TOTAL KGS": 85,
       "HORA DE COMIENZO": "1899-12-30T20:13:04.000Z",
-      "HORA DE TERMINADO": "",
+      "HORA DE TERMINADO": "1899-12-30T21:18:04.000Z",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
       "COMENTARIOS": ""
@@ -40091,26 +40091,26 @@
       "NO. MAQUINA": 3,
       "TOTAL KGS": 8,
       "HORA DE COMIENZO": "1899-12-30T20:58:04.000Z",
-      "HORA DE TERMINADO": "",
+      "HORA DE TERMINADO": "1899-12-30T22:18:04.000Z",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
       "COMENTARIOS": ""
     },
     {
       "FOLIO": 641,
-      "FECHA": "",
-      "NO. WO": "",
-      "TIPO DE PRENDA": "",
-      "TIPO DE PROCESO": "",
-      "COLOR": "",
+      "FECHA": "2026-11-10T08:00:00.000Z",
+      "NO. WO": "MUESTRAS JV",
+      "TIPO DE PRENDA": "SUDADERA C/GORRO",
+      "TIPO DE PROCESO": "PINTURA EN MESA",
+      "COLOR": "VARIOS",
       "CANTIDAD DE PIEZAS": "",
       "NO. MAQUINA": "",
       "TOTAL KGS": "",
-      "HORA DE COMIENZO": "",
-      "HORA DE TERMINADO": "",
+      "HORA DE COMIENZO": "1899-12-30T21:18:04.000Z",
+      "HORA DE TERMINADO": "1899-12-31T00:18:04.000Z",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
-      "COMENTARIOS": ""
+      "COMENTARIOS": "MUESTRAS SPRY POTASIO"
     },
     {
       "FOLIO": 642,
@@ -41313,6 +41313,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-11T00:29:13.935Z",
+  "generatedAt": "2026-11-11T09:08:32.785Z",
   "source": "Google Sheets"
 }
