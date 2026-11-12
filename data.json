@@ -29873,23 +29873,23 @@
       "CUADROS": 2,
       "TIENDA": "HOT TOPIC",
       "TIPO DE HIT": "FRONT",
-      "PRENDAS": "",
+      "PRENDAS": 2,
       "DEPTO": "EJEMPLOS",
       "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
       "FOLIO": 233,
-      "FECHA": "",
-      "CLIENTE": "",
+      "FECHA": "2026-11-11T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
       "NO. FOLDER": "",
-      "ESTILO": "",
-      "CUADROS": "",
-      "TIENDA": "",
-      "TIPO DE HIT": "",
-      "PRENDAS": "",
-      "DEPTO": "",
-      "ESPECIALIDAD": "",
+      "ESTILO": "TSFC3LVPNY",
+      "CUADROS": 10,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 3,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
@@ -29903,7 +29903,7 @@
       "TIPO DE HIT": "",
       "PRENDAS": "",
       "DEPTO": "",
-      "ESPECIALIDAD": "",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     }
   ],
@@ -41365,6 +41365,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-11T17:25:35.389Z",
+  "generatedAt": "2026-11-12T09:08:34.269Z",
   "source": "Google Sheets"
 }
