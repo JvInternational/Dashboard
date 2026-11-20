@@ -30306,31 +30306,73 @@
       "NOTAS": ""
     },
     {
-      "FOLIO": "",
+      "FOLIO": 251,
       "FECHA": "2026-11-19T08:00:00.000Z",
       "CLIENTE": "BIOWORLD",
       "NO. FOLDER": "",
       "ESTILO": "TSFBLW1KPO",
       "CUADROS": 10,
       "TIENDA": "HOT TOPIC",
-      "TIPO DE HIT": "",
-      "PRENDAS": "",
-      "DEPTO": "",
-      "ESPECIALIDAD": "",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "PRODUCCION",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     },
     {
-      "FOLIO": "",
-      "FECHA": "",
+      "FOLIO": 252,
+      "FECHA": "2026-11-19T08:00:00.000Z",
       "CLIENTE": "BIOWORLD",
       "NO. FOLDER": "",
-      "ESTILO": "",
+      "ESTILO": "TS142402BTM",
       "CUADROS": 2,
       "TIENDA": "HOT TOPIC",
-      "TIPO DE HIT": "",
-      "PRENDAS": "",
-      "DEPTO": "",
-      "ESPECIALIDAD": "",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "PRODUCCION",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": "REEMPLAZO"
+    },
+    {
+      "FOLIO": 253,
+      "FECHA": "2026-11-19T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSF23HDLNT",
+      "CUADROS": 12,
+      "TIENDA": "ROSS",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 4,
+      "DEPTO": "EJEMPLOS",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": 254,
+      "FECHA": "2026-11-19T08:00:00.000Z",
+      "CLIENTE": "BIOWORLD",
+      "NO. FOLDER": "",
+      "ESTILO": "TSF9PBJLOL",
+      "CUADROS": 7,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "FRONT",
+      "PRENDAS": 1,
+      "DEPTO": "PRODUCCION",
+      "ESPECIALIDAD": "NONE",
+      "NOTAS": ""
+    },
+    {
+      "FOLIO": 255,
+      "FECHA": "2026-11-19T08:00:00.000Z",
+      "CLIENTE": "STEAL DEAL",
+      "NO. FOLDER": "",
+      "ESTILO": "MAISON",
+      "CUADROS": 9,
+      "TIENDA": "HOT TOPIC",
+      "TIPO DE HIT": "BACK",
+      "PRENDAS": 1,
+      "DEPTO": "PRODUCCION",
+      "ESPECIALIDAD": "NONE",
       "NOTAS": ""
     }
   ],
@@ -42010,7 +42052,7 @@
       "NO. MAQUINA": 1,
       "TOTAL KGS": 56,
       "HORA DE COMIENZO": "1899-12-30T21:38:04.000Z",
-      "HORA DE TERMINADO": "",
+      "HORA DE TERMINADO": "1899-12-30T22:23:04.000Z",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
       "COMENTARIOS": ""
@@ -42074,7 +42116,7 @@
       "NO. MAQUINA": "",
       "TOTAL KGS": "",
       "HORA DE COMIENZO": "",
-      "HORA DE TERMINADO": "",
+      "HORA DE TERMINADO": ",",
       "TIEMPO MUERTO (MINS)": "",
       "MOTIVO": "",
       "COMENTARIOS": ""
@@ -63632,6 +63674,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-19T22:58:27.299Z",
+  "generatedAt": "2026-11-20T09:08:56.238Z",
   "source": "Google Sheets"
 }
