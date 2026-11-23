@@ -42188,7 +42188,7 @@
       "FECHA": "2026-11-20T08:00:00.000Z",
       "NO. WO": "TS54394",
       "TIPO DE PRENDA": "TELA EN LIENZO",
-      "TIPO DE PROCESO": "",
+      "TIPO DE PROCESO": "PRELAVADO",
       "COLOR": "MOSTAZA",
       "CANTIDAD DE PIEZAS": "",
       "NO. MAQUINA": 1,
@@ -63784,6 +63784,6 @@
       "COMENTARIOS": ""
     }
   ],
-  "generatedAt": "2026-11-23T19:47:00.992Z",
+  "generatedAt": "2026-11-23T19:49:25.557Z",
   "source": "Google Sheets"
 }
